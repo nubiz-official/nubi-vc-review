@@ -35,6 +35,17 @@ header[data-testid="stHeader"] { background: transparent !important; }
 label, .stTextInput label, .stTextArea label { color: #e8eaf2 !important; }
 p, span, div { color: #c9cdd5; }
 [data-testid="stExpander"] summary span { color: #e8eaf2 !important; font-weight: 600 !important; }
+[data-testid="stExpander"] [data-testid="stIconMaterial"],
+[data-testid="stExpander"] [data-testid="stIconMaterial"] * {
+    font-family: 'Material Symbols Rounded' !important;
+    font-size: 0 !important;
+}
+[data-testid="stExpander"] [data-testid="stIconMaterial"]::before {
+    content: "\\25B6"; font-family: 'Noto Sans KR', sans-serif !important; font-size: 12px !important;
+}
+[data-testid="stExpander"][open] [data-testid="stIconMaterial"]::before {
+    content: "\\25BC";
+}
 .block-container { max-width: 780px !important; padding-top: 2rem !important; }
 
 .vc-hero {
