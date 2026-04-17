@@ -8,7 +8,7 @@ COPY streamlit_app ./streamlit_app/
 COPY .streamlit ./.streamlit/
 EXPOSE 8501
 CMD streamlit run streamlit_app/app.py \
-    --server.port=8501 \
+    --server.port=${PORT:-8501} \
     --server.address=0.0.0.0 \
     --server.headless=true \
     --server.enableWebsocketCompression=false
