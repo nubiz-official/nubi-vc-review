@@ -354,19 +354,44 @@ class Reporter:
 
         md += "---\n\n## Early Indicators\n\n"
         if isinstance(early_ind, list):
+            # 먼저 모든 indicator의 formula_type을 수집해서 일관성 검증
+            formula_types = [
+                ind.get("formula_type", "") for ind in early_ind
+                if isinstance(ind, dict)
+            ]
+            unique_types = {t for t in formula_types if t}
+            if len(unique_types) > 1:
+                md += f"> ⚠️ **형식 일관성 경고**: 3개 indicator의 formula_type이 통일되지 않았습니다 ({', '.join(unique_types)}). 엔진 규격상 모두 같은 형식이어야 합니다.\n\n"
+
             for ind in early_ind:
                 if isinstance(ind, dict):
                     name = ind.get("indicator_name") or ind.get("name") or ind.get("indicator") or ""
                     ir_ev = ind.get("ir_evidence") or ind.get("description") or ind.get("current_status") or ""
                     why = ind.get("why_signal", "")
-                    formula = ind.get("evaluation_formula", "")
+                    formula_type = ind.get("formula_type", "")
+                    inputs = ind.get("input_variables", [])
+                    calc = ind.get("calculation", "")
+                    result_t = ind.get("result_type", "")
+                    legacy_formula = ind.get("evaluation_formula", "")
+
                     md += f"### {name}\n"
                     if ir_ev:
-                        md += f"- **2017 IR 근거:** {ir_ev}\n"
+                        md += f"- **IR 근거:** {ir_ev}\n"
                     if why:
                         md += f"- **왜 시그널인가:** {why}\n"
-                    if formula:
-                        md += f"- **평가 공식:** `{formula}`\n"
+                    # 구조화된 공식 표시 (4개 필드 중 하나라도 있으면 구조 표시)
+                    if formula_type or inputs or calc or result_t:
+                        md += f"- **평가 공식** (`{formula_type or '형식 미지정'}`):\n"
+                        if inputs:
+                            input_list = inputs if isinstance(inputs, list) else [inputs]
+                            md += f"  - 입력 변수: {', '.join(str(x) for x in input_list)}\n"
+                        if calc:
+                            md += f"  - 계산식: `{calc}`\n"
+                        if result_t:
+                            md += f"  - 결과 타입: {result_t}\n"
+                    elif legacy_formula:
+                        # legacy 호환: formula_type 등이 없으면 evaluation_formula 1줄만
+                        md += f"- **평가 공식:** `{legacy_formula}`\n"
                     md += "\n"
                 else:
                     md += f"- {ind}\n"

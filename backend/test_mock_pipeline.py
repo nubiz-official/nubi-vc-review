@@ -27,8 +27,8 @@ MOCK_CLAUDE_JSON = {
         "clinical_cases": {"value": "미국 10개 병원 1,000+ 케이스", "source": "2024 IR p.8", "note": "De Novo 임상"},
         "overseas_revenue_ratio": {"value": "90%", "source": "2024 IR p.14", "note": "확정"}
     },
-    "headline": "Recens Medical: B+-Grade Investment — HIFU 플랫폼의 FDA De Novo 경로 확정 + 소모품 20% 구조",
-    "investment_case": "Recens Medical은 HIFU 기반 정맥 치료 플랫폼으로 FDA De Novo 경로를 6년간 준비하여 임상 1000+ 케이스를 확보했다. 2017년 창업 이후 모듈형 아키텍처로 소모품 매출 비중 20%를 설계했으며, 규제 실행 조직을 선배치했다. 경쟁사 Intuitive Surgical 대비 적응증 특화로 non-inferiority 확보 가능.",
+    "headline": "리센스메디컬: De Novo + razor-blade 구조로 IPO 전환 가능성 높은 조건부 Buy",
+    "investment_case": "기술 제어력 축에서 HIFU 기반 정밀 온도 제어 알고리즘이 FDA 재현성 요건을 구조적으로 충족한다. 반복매출 축에서 razor-blade 모델이 기기 설계 단계(카트리지 180g)부터 내재화되어 소모품 매출 비중 80%+를 확보했다. 규제 축에서 2018년 De Novo 전환을 거쳐 2024.10 승인을 달성하여 IPO 변곡점을 지났다.",
     "investment_decision": "buy",
     "risk_level": "medium",
     "investment_thesis": "강점: FDA De Novo 경로, 소모품 설계, IP 포트폴리오. 약점: 적응증 제한, IPO 밸류에이션 선반영 우려.",
@@ -43,9 +43,36 @@ MOCK_CLAUDE_JSON = {
         ]
     },
     "early_indicators": [
-        {"indicator_name": "원천기술 물리적 제어 가능성", "ir_evidence": "CEO 김건호 Nature Materials 2013/2015 논문, 초당 50회 피드백 제어", "why_signal": "물리 제어는 FDA 재현성 요건을 구조적으로 충족", "evaluation_formula": "원천기술 제어력 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수"},
-        {"indicator_name": "규제 실행 조직 선배치", "ir_evidence": "RA 경력 20년 백종환 COO, 100개 제품 인허가 경력", "why_signal": "규제를 R&D와 병렬 실행할 때만 IPO 타이밍 확보", "evaluation_formula": "규제 지능 점수 = (RA 합류 시점 ÷ 창업 후 경과월) × 규제 경로 난이도"},
-        {"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "ir_evidence": "'One Device, Different Disposables' — 카트리지 분리 설계", "why_signal": "모듈화는 반복매출 + 빠른 규제 확장의 동시 조건", "evaluation_formula": "모듈화 점수 = (소모품 SKU 수 × 임상 영역 수) / 기기 플랫폼 수"}
+        {
+            "indicator_name": "원천기술 물리적 제어 가능성",
+            "ir_evidence": "CEO 김건호 Nature Materials 2013/2015 논문, 초당 50회 피드백 제어",
+            "why_signal": "물리 제어는 FDA 재현성 요건을 구조적으로 충족",
+            "formula_type": "계산식형",
+            "input_variables": ["물리 파라미터 수", "총 변수 수", "재현성 계수"],
+            "calculation": "점수 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수",
+            "result_type": "숫자형 (0-10)",
+            "evaluation_formula": "점수 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수 → 0~10 숫자형"
+        },
+        {
+            "indicator_name": "규제 실행 조직 선배치",
+            "ir_evidence": "RA 경력 20년 백종환 COO, 100개 제품 인허가 경력",
+            "why_signal": "규제를 R&D와 병렬 실행할 때만 IPO 타이밍 확보",
+            "formula_type": "계산식형",
+            "input_variables": ["RA 합류 시점(창업 후 개월)", "창업 후 경과월", "규제 경로 난이도"],
+            "calculation": "점수 = (RA 합류 시점 / 창업 후 경과월) × 규제 경로 난이도",
+            "result_type": "숫자형 (0-10)",
+            "evaluation_formula": "점수 = (RA 합류 시점 / 창업 후 경과월) × 규제 경로 난이도 → 0~10 숫자형"
+        },
+        {
+            "indicator_name": "제품 아키텍처 모듈화/소모품 설계",
+            "ir_evidence": "'One Device, Different Disposables' — 카트리지 분리 설계",
+            "why_signal": "모듈화는 반복매출 + 빠른 규제 확장의 동시 조건",
+            "formula_type": "계산식형",
+            "input_variables": ["소모품 SKU 수", "적용 임상 영역 수", "기기 플랫폼 수"],
+            "calculation": "점수 = (소모품 SKU 수 × 임상 영역 수) / 기기 플랫폼 수",
+            "result_type": "숫자형 (0-10)",
+            "evaluation_formula": "점수 = (소모품 SKU 수 × 임상 영역 수) / 기기 플랫폼 수 → 0~10 숫자형"
+        }
     ],
     "momentum_entry_timeline": {
         "regulatory": [
@@ -335,6 +362,48 @@ def run_mock():
     for k, v in wave1i_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [W1-K] Headline 톤 보수화 확인 ---")
+    headline = es.get("headline", "")
+    wave1k_checks = {
+        "단정 표현 배제 (IPO 직전)": "IPO 직전" not in headline,
+        "단정 표현 배제 (상장 확정)": "상장 확정" not in headline,
+        "유보 표현 존재 (조건부/전환/가능성/잠재력 중 하나)": any(t in headline for t in ["조건부", "전환 가능성", "가능성", "잠재력"]),
+    }
+    for k, v in wave1k_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-L] Investment Case 3문장 압축 확인 ---")
+    ic = es.get("investment_case", "")
+    # 문장 수 계산 (마침표 기준, 마지막 마침표 후 빈 문장 제외)
+    sentences = [s for s in ic.split(".") if s.strip()]
+    wave1l_checks = {
+        "3문장 전후 (3~4개)": 3 <= len(sentences) <= 4,
+        "기술 제어력 축 언급": "제어력" in ic or "제어" in ic,
+        "반복매출 축 언급": "반복매출" in ic or "razor-blade" in ic.lower() or "razor" in ic.lower(),
+        "규제/IPO 변곡점 언급": "IPO" in ic and ("변곡점" in ic or "승인" in ic or "De Novo" in ic),
+    }
+    for k, v in wave1l_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-M] Early Indicators 공식 포맷 통일 확인 ---")
+    # mock에서 phase1_analysis의 early_indicators 직접 확인
+    phase1 = analysis_internal.get("phase1_analysis", {})
+    raw_inds = phase1.get("early_indicators", [])
+    f_types = [ind.get("formula_type") for ind in raw_inds if isinstance(ind, dict)]
+    unique_ft = set(t for t in f_types if t)
+    wave1m_checks = {
+        "3개 indicator 전부 formula_type 존재": len(f_types) == 3 and all(t for t in f_types),
+        "formula_type 통일": len(unique_ft) == 1,
+        "입력변수 필드 존재": all(ind.get("input_variables") for ind in raw_inds if isinstance(ind, dict)),
+        "계산식 필드 존재": all(ind.get("calculation") for ind in raw_inds if isinstance(ind, dict)),
+        "결과타입 필드 존재": all(ind.get("result_type") for ind in raw_inds if isinstance(ind, dict)),
+        "마크다운에 입력 변수 라벨": "입력 변수" in md,
+        "마크다운에 계산식 라벨": "계산식" in md,
+        "마크다운에 결과 타입 라벨": "결과 타입" in md,
+    }
+    for k, v in wave1m_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n--- [W1-J] 섹션 순서 재배치 확인 (Risks가 Early Indicators 앞) ---")
     exec_pos = md.find("## Executive Summary")
     num_pos = md.find("## Numeric Reference Table")
@@ -374,6 +443,9 @@ def run_mock():
     all_w1h = all(wave1h_checks.values())
     all_w1i = all(wave1i_checks.values())
     all_w1j = all(wave1j_checks.values())
+    all_w1k = all(wave1k_checks.values())
+    all_w1l = all(wave1l_checks.values())
+    all_w1m = all(wave1m_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -404,8 +476,14 @@ def run_mock():
         print("FAIL: Wave 1-I (stage_5 Current/Uplift 분리) 누락")
     elif not all_w1j:
         print("FAIL: Wave 1-J (섹션 순서 재배치) 누락")
+    elif not all_w1k:
+        print("FAIL: Wave 1-K (Headline 톤 보수화) 누락")
+    elif not all_w1l:
+        print("FAIL: Wave 1-L (Investment Case 3문장 압축) 누락")
+    elif not all_w1m:
+        print("FAIL: Wave 1-M (Early Indicators 공식 통일) 누락")
     else:
-        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 추가 개선 (H/I/J) 전부 정상")
+        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 개선 (H~J) + 2차 다듬기 (K~M) 전부 정상")
     print("=" * 70)
 
 

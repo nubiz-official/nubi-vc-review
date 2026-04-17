@@ -143,11 +143,13 @@ class Analyzer:
     "overseas_revenue_ratio": {{"value": "<해외 매출 비중 % (예: 90%)>", "source": "<IR 페이지>", "note": "<확정/[추정]>"}}
   }},
   "// numeric_reference_table 규칙": "이 테이블은 보고서 전체의 숫자 원천(Single Source of Truth)이다. Executive Summary, investment_case, stage evidence, risks, factor_discovery, momentum_entry_timeline, cross_validation 등 다른 모든 섹션에서 이 숫자들을 인용할 때 일관된 값만 사용하라. IR에 근거 없는 수치는 이 테이블에 포함하지 말고 '[IR 미기재]'로 표기. 동일 지표가 섹션마다 다른 값으로 나오지 않도록 엄격히 일치시켜라.",
-  "headline": "<회사명>: <한 줄 투자 판단>",
-  "investment_case": "<3-5문장 투자 논리. 구체 수치/규제명/플랫폼 포함>",
+  "headline": "<한 줄 투자 판단. 톤은 보수적으로. '직전 단계/확정/IPO 임박' 같은 단정 금지. 권장 패턴: '<회사명>: <핵심 논리>로 조건부 <판단>' 예: '리센스메디컬: De Novo + razor-blade 구조로 IPO 전환 가능성 높은 조건부 Buy'>",
+  "investment_case": "<정확히 3문장으로 작성. (1) 기술 제어력 관점 (2) 반복매출 구조 관점 (3) 규제/IPO 변곡점 관점. 세부 인증·채널·특허·지분·매출 수치 등은 Numeric Reference Table과 Stage Evidence에 위임하고 여기서는 언급 금지. 문장 하나당 2줄 이내.>",
   "investment_decision": "<strong_buy|buy|hold|strong_avoid>",
   "risk_level": "<low|medium|high|critical>",
-  "investment_thesis": "<핵심 강점과 약점 정리>",
+  "investment_thesis": "<핵심 강점과 약점 정리. 3~5문장.>",
+  "// headline 규칙": "Headline에는 'IPO 직전', '상장 확정', '즉시 투자' 같은 단정적 단어 금지. 심사 중 전망(under_review_forward)인 경우 반드시 '조건부', '전환 가능성', '잠재력' 같은 유보적 표현을 포함하라.",
+  "// investment_case 규칙": "정확히 3문장. 각 문장은 (1) 기술 제어력, (2) 반복매출 구조, (3) 규제/IPO 변곡점 순서. 세부 숫자·인증·채널 등은 다른 섹션(Numeric Reference Table, Stage Evidence)으로 위임. 여기에는 전략적 프레임만 남기고 디테일 나열 금지.",
 
   "factor_discovery": {{
     "platform_evolution": "<핵심 기술의 플랫폼 확장 가능성>",
@@ -162,10 +164,11 @@ class Analyzer:
   }},
 
   "early_indicators": [
-    {{"indicator_name": "원천기술 물리적 제어 가능성", "ir_evidence": "<IR 원문에서 직접 인용 (학술논문/프로토타입/제어 파라미터)>", "why_signal": "<왜 이것이 IPO 시그널인가: 물리제어 = 규제 재현성 확보>", "evaluation_formula": "<예: 원천기술 제어력 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수>"}},
-    {{"indicator_name": "규제 실행 조직 선배치", "ir_evidence": "<IR 원문 인용: RA/QC 전문가 경력, 합류 시점>", "why_signal": "<왜 시그널인가: 규제는 R&D와 병렬 실행될 때만 IPO 타이밍 확보>", "evaluation_formula": "<예: 규제 지능 점수 = (RA 합류 시점 ÷ 창업 후 경과월) × 규제 경로 난이도>"}},
-    {{"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "ir_evidence": "<IR 원문 인용: 기기-소모품 분리 설계, 카트리지 구조 등>", "why_signal": "<왜 시그널인가: 모듈화 = 반복매출 + 빠른 인증 확장>", "evaluation_formula": "<예: 모듈화 점수 = (소모품 SKU 수 × 적용 임상 영역 수) / 기기 플랫폼 수>"}}
+    {{"indicator_name": "원천기술 물리적 제어 가능성", "ir_evidence": "<IR 원문에서 직접 인용>", "why_signal": "<왜 이것이 IPO 시그널인가>", "formula_type": "<계산식형|범주형|배수형 중 택1 — 모든 indicator는 통일된 형식으로>", "input_variables": ["<변수1>", "<변수2>"], "calculation": "<예: 점수 = A × B × C  (계산식형) 또는 '물리 파라미터 수 / 총 변수 수' (계산식형)>", "result_type": "<숫자형(0-10)|배수형(0-5)|범주형(high/medium/low) 중 택1>", "evaluation_formula": "<input_variables/calculation/result_type을 1줄로 합친 legacy 표기. 예: '점수 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수 → 0~10 숫자형'>"}},
+    {{"indicator_name": "규제 실행 조직 선배치", "ir_evidence": "<IR 원문 인용>", "why_signal": "<왜 시그널인가>", "formula_type": "<계산식형|범주형|배수형>", "input_variables": ["<변수1>", "<변수2>"], "calculation": "<위와 동일한 형식 규칙>", "result_type": "<위와 동일>", "evaluation_formula": "<legacy 1줄 표기>"}},
+    {{"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "ir_evidence": "<IR 원문 인용>", "why_signal": "<왜 시그널인가>", "formula_type": "<계산식형|범주형|배수형>", "input_variables": ["<변수1>", "<변수2>"], "calculation": "<위와 동일한 형식 규칙>", "result_type": "<위와 동일>", "evaluation_formula": "<legacy 1줄 표기>"}}
   ],
+  "// early_indicators 규칙": "3개 indicator 모두 동일한 formula_type을 사용하라 (전부 '계산식형' 또는 전부 '배수형' 또는 전부 '범주형'). 섞지 마라. input_variables는 최소 2개, calculation은 formula_type과 일치해야 한다. result_type도 formula_type과 일치. evaluation_formula는 사람이 읽기 위한 1줄 요약 (legacy 호환용).",
 
   "stage_1_원천기술통제": {{"score": <0-10 숫자>, "evidence": ["<근거 문장 1>", "<근거 문장 2>"], "confidence": <0-1>}},
   "stage_2_규제통제": {{"score": <0-10 숫자>, "evidence": ["<FDA 경로명 포함 근거>"], "confidence": <0-1>}},
