@@ -4,20 +4,32 @@ NuBI VC Review — 투자 타당성 검토 플랫폼 (Railway 배포용)
 
 Pipeline: Input → Analyzer (Phase 1) → Validator (Phase 2) → Reporter → Display
 """
+import sys
+import os
+
+# Early stderr logging (before streamlit import)
+sys.stderr.write(">>> INIT 1: sys imported\n")
+sys.stderr.flush()
+
 import streamlit as st
-print("✓ Streamlit imported")
+sys.stderr.write(">>> INIT 2: streamlit imported\n")
+sys.stderr.flush()
 
 # Set page config FIRST
-st.set_page_config(
-    page_title="NuBI VC Review",
-    page_icon="📊",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
-print("✓ Page config set")
+try:
+    st.set_page_config(
+        page_title="NuBI VC Review",
+        page_icon="📊",
+        layout="centered",
+        initial_sidebar_state="collapsed",
+    )
+    sys.stderr.write(">>> INIT 3: page config set\n")
+    sys.stderr.flush()
+except Exception as e:
+    sys.stderr.write(f">>> ERROR at set_page_config: {e}\n")
+    sys.stderr.flush()
+    raise
 
-import os
-import sys
 import pdfplumber
 import io
 import json
@@ -25,18 +37,27 @@ import pandas as pd
 from datetime import datetime
 from docx import Document
 import uuid
-print("✓ Standard libraries imported")
+sys.stderr.write(">>> INIT 4: standard libraries imported\n")
+sys.stderr.flush()
 
 # Backend imports
 streamlit_dir = os.path.dirname(os.path.abspath(__file__))
 service_root = os.path.dirname(streamlit_dir)
+sys.stderr.write(f">>> INIT 5: streamlit_dir={streamlit_dir}, service_root={service_root}\n")
+sys.stderr.flush()
+
 if service_root not in sys.path:
     sys.path.insert(0, service_root)
+    sys.stderr.write(f">>> INIT 6: added {service_root} to sys.path\n")
+    sys.stderr.flush()
 
 try:
     from backend import Analyzer, Validator, Reporter, SchemaValidator
-    print("✓ Backend modules imported")
+    sys.stderr.write(">>> INIT 7: backend modules imported successfully\n")
+    sys.stderr.flush()
 except ImportError as e:
+    sys.stderr.write(f">>> ERROR importing backend: {e}\n")
+    sys.stderr.flush()
     st.error(f"Backend import failed: {e}")
     import traceback
     st.write(traceback.format_exc())
