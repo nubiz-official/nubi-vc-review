@@ -27,6 +27,44 @@ MOCK_CLAUDE_JSON = {
         "clinical_cases": {"value": "미국 10개 병원 1,000+ 케이스", "source": "2024 IR p.8", "note": "De Novo 임상"},
         "overseas_revenue_ratio": {"value": "90%", "source": "2024 IR p.14", "note": "확정"}
     },
+    "executive_verdict": {
+        "one_line_verdict": "승인 후 역산 관점에서 5축 성공 패턴 전부 충족 — 조건부 Buy (소모품 20% 구조 검증 필요)",
+        "verdict_type": "conditional_go",
+        "key_driver": "FDA De Novo 2024.10 승인 + razor-blade 소모품 80% 구조 + 해외 매출 90%"
+    },
+    "narrative_reframing": {
+        "current_narrative": "HIFU 기반 정맥 치료 의료기기 회사",
+        "reframed_narrative": "FDA De Novo로 카테고리를 개척한 razor-blade 플랫폼 기업",
+        "why_more_persuasive": "단일 디바이스가 아닌 플랫폼 + 반복매출 구조로 프레임 시 VC 밸류에이션 프리미엄 확보 가능. Intuitive Surgical 궤적과 직접 비교 가능.",
+        "applicable_segments": ["medtech 전문 VC", "razor-blade 모델 선호 PE"],
+        "caveat": "플랫폼 확장은 현재 2개 적응증에 한정 — 허위 확대 금지"
+    },
+    "deal_structuring_suggestions": [
+        {
+            "structure_type": "milestone_based",
+            "conditions": ["2025 Q1 소모품 매출 비중 80% 검증 시 1차 집행", "IPO 밸류에이션 확정 시 2차 집행"],
+            "rationale": "소모품 구조 검증 전 전액 집행은 밸류에이션 리스크. 마일스톤 분할로 하방 제한.",
+            "target_investors": "IPO 직전 라운드 VC + 전략 LP"
+        },
+        {
+            "structure_type": "strategic_co_investment",
+            "conditions": ["Intuitive Surgical 계열 전략 LP 유치 조건부", "NuBIZ 공동 실사 완료"],
+            "rationale": "전략 투자자 참여 시 유통·규제 채널 추가 가치 + Exit 명확성 상승.",
+            "target_investors": "OEM 전략투자자 + NuBIZ 공동"
+        }
+    ],
+    "problem_cost_severity": {
+        "problem_description": "정맥 시술 시 환자 통증 및 마취 부담 (기존 IVT 마취 무효율 30%+)",
+        "annual_cost_magnitude": "[추정] $500M+ annual (US IVT 시장 마취 실패 재시술 비용)",
+        "cost_basis": "AAOS 2023 + Medscape 2024 report (web_search 검증)",
+        "stakeholder_impact": [
+            {"stakeholder": "환자", "impact": "시술 재방문 평균 2.3회, 통증 지속"},
+            {"stakeholder": "병원", "impact": "시술당 수익 $150 저하 + 재방문 슬롯 낭비"},
+            {"stakeholder": "보험자", "impact": "재시술 청구액 연 $200M 추가 부담"}
+        ],
+        "evidence_sources": ["AAOS 2023 report", "Medscape 2024 IVT study", "CMS claim data 2022-2024"],
+        "unmet_need_score": "high (partial)"
+    },
     "headline": "리센스메디컬: De Novo + razor-blade 구조로 IPO 전환 가능성 높은 조건부 Buy",
     "investment_case": "기술 제어력 축에서 HIFU 기반 정밀 온도 제어 알고리즘이 FDA 재현성 요건을 구조적으로 충족한다. 반복매출 축에서 razor-blade 모델이 기기 설계 단계(카트리지 180g)부터 내재화되어 소모품 매출 비중 80%+를 확보했다. 규제 축에서 2018년 De Novo 전환을 거쳐 2024.10 승인을 달성하여 IPO 변곡점을 지났다.",
     "investment_decision": "buy",
@@ -135,11 +173,11 @@ MOCK_CLAUDE_JSON = {
         {"item": "CEO 이외 핵심 인력 (코파운더 유무, 리텐션 리스크)", "criticality": "medium", "current_status": "CEO 1인 의존 구조, 코파운더 부재", "next_evidence_needed": "핵심 인력 리텐션 계약 + 조직도", "fail_implication": "CEO 이탈 시 기술 연속성 리스크"}
     ],
     "nubiz_fit_leverage": [
-        {"company_need": "FDA/ISO 13485 인증 지원", "nubiz_capability": "P08 에스테틱 의료기기 FDA/CE 11개국 인증 경험", "intervention_mode": "공동 인증 컨설팅 + 문서 템플릿 제공", "expected_deliverable": "510(k) Ready Package + 인증 대응 교육", "feasibility_90d": "high"},
-        {"company_need": "로봇 제어 SW 고도화", "nubiz_capability": "P06 AI로봇 VLA + P08 에너지 제어 기술", "intervention_mode": "로봇셀 제어 알고리즘 공동 최적화", "expected_deliverable": "에너지 제어 최적화 모듈 + 벤치마크 리포트", "feasibility_90d": "medium"},
-        {"company_need": "블록체인 품질 추적 시스템", "nubiz_capability": "P07 RWW + ALCOA+ (GMP 치환 설계)", "intervention_mode": "FAI/코팅 품질 블록체인 추적 구축", "expected_deliverable": "ALCOA+ 준수 품질 추적 시스템 프로토타입", "feasibility_90d": "medium"},
-        {"company_need": "데이터 분석 및 IR 자동화", "nubiz_capability": "NUBiPLOT + NuBI Orchestrator", "intervention_mode": "실시간 매출/FAI 데이터 기반 IR 자동 업데이트", "expected_deliverable": "월별 투자자 대시보드 + IR 자료 자동 생성 파이프라인", "feasibility_90d": "high"},
-        {"company_need": "정부 R&D 과제 수주", "nubiz_capability": "P09 과기부 500억 경험 + 국가과제 다수", "intervention_mode": "과제 기획 공동 작성 + 네트워크 연결", "expected_deliverable": "2건 이상 R&D 과제 제안서 + 참여기관 확보", "feasibility_90d": "medium"}
+        {"company_need": "FDA/ISO 13485 인증 지원", "nubiz_capability": "에스테틱 의료기기 FDA/CE 11개국 인증 경험", "nubiz_asset_reference": "P08 (에스테틱)", "match_strength": "high (★★★★☆)", "intervention_mode": "공동 인증 컨설팅 + 문서 템플릿 제공", "expected_deliverable": "510(k) Ready Package + 인증 대응 교육", "feasibility_90d": "high"},
+        {"company_need": "로봇 제어 SW 고도화", "nubiz_capability": "AI로봇 VLA + 에너지 제어 기술", "nubiz_asset_reference": "P06 (AI로봇 VLA) + P08", "match_strength": "medium (★★★☆☆)", "intervention_mode": "로봇셀 제어 알고리즘 공동 최적화", "expected_deliverable": "에너지 제어 최적화 모듈 + 벤치마크 리포트", "feasibility_90d": "medium"},
+        {"company_need": "블록체인 품질 추적 시스템", "nubiz_capability": "RWW + ALCOA+ (GMP 치환 설계)", "nubiz_asset_reference": "P07 (RWW+ALCOA+)", "match_strength": "high (★★★★☆)", "intervention_mode": "FAI/코팅 품질 블록체인 추적 구축", "expected_deliverable": "ALCOA+ 준수 품질 추적 시스템 프로토타입", "feasibility_90d": "medium"},
+        {"company_need": "데이터 분석 및 IR 자동화", "nubiz_capability": "NUBiPLOT + NuBI Orchestrator", "nubiz_asset_reference": "NUBiPLOT + NuBI Orchestrator", "match_strength": "strong (★★★★★)", "intervention_mode": "실시간 매출/FAI 데이터 기반 IR 자동 업데이트", "expected_deliverable": "월별 투자자 대시보드 + IR 자료 자동 생성 파이프라인", "feasibility_90d": "high"},
+        {"company_need": "정부 R&D 과제 수주", "nubiz_capability": "과기부 500억 경험 + 국가과제 다수", "nubiz_asset_reference": "P09 (과기부 500억)", "match_strength": "high (★★★★☆)", "intervention_mode": "과제 기획 공동 작성 + 네트워크 연결", "expected_deliverable": "2건 이상 R&D 과제 제안서 + 참여기관 확보", "feasibility_90d": "medium"}
     ],
     "nubiz_laws": [
         {"law": "기술이 아니라 제어력이 상장한다", "evidence_for_company": "경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, -50℃~+5℃ 범위 제어가 FDA 재현성 요건을 충족"},
@@ -400,6 +438,61 @@ def run_mock():
     for k, v in wave1i_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [W1-Q] Executive One-Line Verdict 확인 ---")
+    wave1q_checks = {
+        "One-Line Verdict 블록": "One-Line Verdict" in md,
+        "verdict 결론 노출": "조건부 Buy" in md or "Verdict" in md,
+        "verdict_type 표시": "conditional_go" in md or "verdict_type" in md or "결론 유형" in md,
+        "최대 동인 노출": "최대 동인" in md,
+    }
+    for k, v in wave1q_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-R] Narrative Reframing 섹션 확인 ---")
+    wave1r_checks = {
+        "섹션 헤더": "Narrative Reframing" in md,
+        "현재 내러티브": "현재 내러티브" in md,
+        "리프레이밍": "리프레이밍:" in md,
+        "왜 설득력 있는가": "설득력" in md,
+        "적중 투자자 유형": "적중 투자자" in md or "투자자 유형" in md,
+    }
+    for k, v in wave1r_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-S] Problem Cost Severity 섹션 확인 ---")
+    wave1s_checks = {
+        "섹션 헤더": "Problem Cost Severity" in md,
+        "연간 경제적 비용": "연간 경제적 비용" in md,
+        "산출 근거": "산출 근거" in md,
+        "Unmet Need Score": "Unmet Need" in md or "unmet" in md.lower(),
+        "이해관계자 표": "이해관계자" in md,
+        "출처 블록": "출처:" in md or "evidence_sources" in md,
+    }
+    for k, v in wave1s_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-T] Deal Structuring Suggestions 섹션 확인 ---")
+    wave1t_checks = {
+        "섹션 헤더": "Deal Structuring Suggestions" in md,
+        "milestone_based 구조": "milestone_based" in md,
+        "strategic_co_investment 구조": "strategic_co_investment" in md,
+        "진입 조건 표시": "진입 조건" in md,
+        "적합 투자자 표시": "적합 투자자" in md,
+    }
+    for k, v in wave1t_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-U] Nubiz Fit 강화 (별점 + 자산 참조) 확인 ---")
+    wave1u_checks = {
+        "참조 자산 컬럼": "참조 자산" in md,
+        "매칭도 컬럼": "매칭도" in md,
+        "P08 자산 표시": "P08" in md,
+        "P07 자산 표시": "P07" in md,
+        "별점 표시 (★)": "★" in md,
+    }
+    for k, v in wave1u_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n--- [W1-N] Investor Concern Validation 섹션 확인 ---")
     wave1n_checks = {
         "섹션 헤더": "Investor Concern Validation" in md,
@@ -521,6 +614,11 @@ def run_mock():
     all_w1n = all(wave1n_checks.values())
     all_w1o = all(wave1o_checks.values())
     all_w1p = all(wave1p_checks.values())
+    all_w1q = all(wave1q_checks.values())
+    all_w1r = all(wave1r_checks.values())
+    all_w1s = all(wave1s_checks.values())
+    all_w1t = all(wave1t_checks.values())
+    all_w1u = all(wave1u_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -563,8 +661,18 @@ def run_mock():
         print("FAIL: Wave 1-O (Diligence Trigger Checklist) 누락")
     elif not all_w1p:
         print("FAIL: Wave 1-P (Nubiz Fit & Leverage) 누락")
+    elif not all_w1q:
+        print("FAIL: Wave 1-Q (Executive One-Line Verdict) 누락")
+    elif not all_w1r:
+        print("FAIL: Wave 1-R (Narrative Reframing) 누락")
+    elif not all_w1s:
+        print("FAIL: Wave 1-S (Problem Cost Severity) 누락")
+    elif not all_w1t:
+        print("FAIL: Wave 1-T (Deal Structuring) 누락")
+    elif not all_w1u:
+        print("FAIL: Wave 1-U (Nubiz Fit 별점/자산 강화) 누락")
     else:
-        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 개선 (H~J) + 2차 (K~M) + Surphase형 (N/O/P) 전부 정상")
+        print("PASS: 모든 항목 + A~P + Q/R/S/T/U (Surphase 2차 확장) 전부 정상")
     print("=" * 70)
 
 

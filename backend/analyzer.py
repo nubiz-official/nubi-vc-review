@@ -94,7 +94,11 @@ class Analyzer:
             "numeric_reference_table": claude_analysis.get("numeric_reference_table", {}),
             "investor_concern_validation": claude_analysis.get("investor_concern_validation", []),
             "diligence_trigger_checklist": claude_analysis.get("diligence_trigger_checklist", []),
-            "nubiz_fit_leverage": claude_analysis.get("nubiz_fit_leverage", [])
+            "nubiz_fit_leverage": claude_analysis.get("nubiz_fit_leverage", []),
+            "executive_verdict": claude_analysis.get("executive_verdict", {}),
+            "narrative_reframing": claude_analysis.get("narrative_reframing", {}),
+            "deal_structuring_suggestions": claude_analysis.get("deal_structuring_suggestions", []),
+            "problem_cost_severity": claude_analysis.get("problem_cost_severity", {})
         }
 
         metadata.status_history.append({
@@ -147,6 +151,11 @@ class Analyzer:
   }},
   "// numeric_reference_table 규칙": "이 테이블은 보고서 전체의 숫자 원천(Single Source of Truth)이다. Executive Summary, investment_case, stage evidence, risks, factor_discovery, momentum_entry_timeline, cross_validation 등 다른 모든 섹션에서 이 숫자들을 인용할 때 일관된 값만 사용하라. IR에 근거 없는 수치는 이 테이블에 포함하지 말고 '[IR 미기재]'로 표기. 동일 지표가 섹션마다 다른 값으로 나오지 않도록 엄격히 일치시켜라.",
   "headline": "<한 줄 투자 판단. 톤은 보수적으로. '직전 단계/확정/IPO 임박' 같은 단정 금지. 권장 패턴: '<회사명>: <핵심 논리>로 조건부 <판단>' 예: '리센스메디컬: De Novo + razor-blade 구조로 IPO 전환 가능성 높은 조건부 Buy'>",
+  "executive_verdict": {{
+    "one_line_verdict": "<임원용 한 줄 의사결정 결론. 예: '드랍 논리 대부분 부정 — 조건부 투자 권고' / '보류 논리 타당 — 추가 실사 후 재검토' / '투자 논리 보강 필요 — 현 단계 단독 투자 부적합'>",
+    "verdict_type": "<'refute_pushback' | 'hold_valid' | 'investment_thesis_weak' | 'conditional_go' | 'clear_go' | 'clear_pass' 중 택1>",
+    "key_driver": "<이 결론의 최대 동인 한 문장. 예: 'FDA De Novo 2024.10 승인 + 소모품 80% 구조'>"
+  }},
   "investment_case": "<정확히 3문장으로 작성. (1) 기술 제어력 관점 (2) 반복매출 구조 관점 (3) 규제/IPO 변곡점 관점. 세부 인증·채널·특허·지분·매출 수치 등은 Numeric Reference Table과 Stage Evidence에 위임하고 여기서는 언급 금지. 문장 하나당 2줄 이내.>",
   "investment_decision": "<strong_buy|buy|hold|strong_avoid>",
   "risk_level": "<low|medium|high|critical>",
@@ -278,12 +287,45 @@ class Analyzer:
     {{
       "company_need": "<회사의 구체 니즈. 예: 'FDA 510(k) 고객사 인증 지원 역량 확보'>",
       "nubiz_capability": "<누비즈 보유 역량 매칭. 예: '에스테틱 의료기기 FDA/CE 11개국 인증 경험'>",
+      "nubiz_asset_reference": "<참조 가능한 누비즈 구체 프로젝트 자산. 예: 'P08 (에스테틱)', 'P06 (AI로봇 VLA)', 'P07 (RWW+ALCOA+)', 'P09 (과기부 500억)', 'NUBiPLOT'. 해당 없으면 '자산 미매칭'>",
+      "match_strength": "<'strong (★★★★★)' | 'high (★★★★☆)' | 'medium (★★★☆☆)' | 'low (★★☆☆☆)' | 'weak (★☆☆☆☆)' 중 택1 — 역량-니즈 매칭 강도>",
       "intervention_mode": "<개입 방식. 예: '공동 인증 컨설팅 + 인허가 문서 템플릿 제공'>",
-      "expected_deliverable": "<기대 산출물. 예: '510(k) 제출 Ready Package (protocol + 테스트 리포트 템플릿 + 규제대응 교육)'>",
-      "feasibility_90d": "<'high' | 'medium' | 'low' 중 택1 — 90일 내 실행 가능성>"
+      "expected_deliverable": "<기대 산출물. 예: '510(k) 제출 Ready Package'>",
+      "feasibility_90d": "<'high' | 'medium' | 'low' 중 택1>"
     }}
   ],
-  "// nubiz_fit_leverage 규칙": "3~6개 항목. 회사 니즈는 IR/반대논리/경쟁구조에서 실제로 추출. '일반적 IR 자동화/마케팅 지원' 같은 추상 매칭 금지. 누비즈 역량(FDA/CE 인증, 로봇제어 SW, 블록체인 품질추적, 데이터 분석, 정부 R&D, 특허관리 등)과 회사 니즈의 구체적 결합만 기술. feasibility_90d는 실제 리소스·기간을 냉정히 반영."
+  "// nubiz_fit_leverage 규칙": "3~6개 항목. 회사 니즈는 IR/반대논리/경쟁구조에서 실제로 추출. '일반적 IR 자동화/마케팅 지원' 같은 추상 매칭 금지. 누비즈 역량(FDA/CE 인증, 로봇제어 SW, 블록체인 품질추적, 데이터 분석, 정부 R&D, 특허관리 등)과 회사 니즈의 구체적 결합만 기술. match_strength는 실제 역량 적합도로 냉정히 평가하여 별점 부여. nubiz_asset_reference는 P06/P07/P08/P09/NUBiPLOT/NuBI Orchestrator 등 구체 프로젝트 코드로 연결.",
+
+  "narrative_reframing": {{
+    "current_narrative": "<회사가 현재 시장·투자자에게 보이는 내러티브. 예: '코팅 회사' / '의료기기 스타트업' — VC 내러티브상 약할 수 있는 표현>",
+    "reframed_narrative": "<같은 본질을 투자자 언어로 번역한 리프레이밍. 예: '의료기기 제조 자동화 로봇 플랫폼' / 'OEM 수직통합형 첨단 제조 플랫폼'>",
+    "why_more_persuasive": "<왜 리프레이밍이 더 설득력 있는가. VC 포지셔닝 관점에서. 예: '코팅은 VC 소외 영역이나 로봇/첨단제조는 대형 라운드 트랙. Canary Medical-Zimmer 전략투자 선례'>",
+    "applicable_segments": ["<이 리프레이밍이 적중하는 VC/투자자 유형 예: 'OEM 전략투자자', '첨단제조 VC'>"],
+    "caveat": "<리프레이밍의 한계. 예: '본질 바뀌는 건 아님. 팩트와 일치하는 범위에서만 사용 가능'>"
+  }},
+  "// narrative_reframing 규칙": "회사의 VC 내러티브 적합성이 낮거나 투자자 언어와 맞지 않을 때 채워라. IR과 실체가 일치하는 범위에서만 리프레이밍 (허위 확대 금지). 완벽히 맞는 회사(이미 강한 내러티브 보유)는 빈 객체 {{}} 허용.",
+
+  "deal_structuring_suggestions": [
+    {{
+      "structure_type": "<'milestone_based' | 'strategic_co_investment' | 'bridge_round' | 'pilot_po_conditional' | 'tranched_with_kpi' | 'sidecar' 중 택1>",
+      "conditions": ["<진입 조건 1 예: 'FAI 300ea 완료 시 1차 집행'>", "<진입 조건 2 예: 'MOU→PO 전환 시 2차 집행'>"],
+      "rationale": "<왜 이 구조가 이 회사에 적합한가 1-2문장>",
+      "target_investors": "<어떤 투자자가 이 구조에 맞는가. 예: 'OEM 전략투자자 + 마일스톤형 VC 공동'>"
+    }}
+  ],
+  "// deal_structuring_suggestions 규칙": "2~4개 구조 권장. 단순 'go/no-go'가 아니라 '어떻게 구조화해서 들어갈 것인가'를 설계. 회사 단계(시드/시리즈A/B/프리IPO)와 리스크 구조에 맞춰 현실적 대안 제시. 모든 회사에 '마일스톤 기반 + 전략투자' 식 일반론 금지.",
+
+  "problem_cost_severity": {{
+    "problem_description": "<회사가 해결하려는 핵심 문제 한 문장>",
+    "annual_cost_magnitude": "<해당 문제의 연간 경제적 비용 규모. 숫자 + 단위 + 지역. 예: '$1.5~2.5B annual (US TKA 재수술 비용)'>",
+    "cost_basis": "<비용 산출 근거. web_search 검증 필수. 예: 'AAOS 2023 report + CMS claim data'>",
+    "stakeholder_impact": [
+      {{"stakeholder": "<병원/보험자/OEM/환자 중>", "impact": "<구체 영향 예: '병원당 재수술 건당 $25k, 연 평균 12건>'"}}
+    ],
+    "evidence_sources": ["<출처 URL 또는 기관명. web_search로 확인한 것만>"],
+    "unmet_need_score": "<'critical (unmet)' | 'high (partial)' | 'medium (addressed)' | 'low (saturated)' 중 택1>"
+  }},
+  "// problem_cost_severity 규칙": "의료/B2B2B/공정장비 회사에 특히 중요. 단순 TAM이 아니라 '이 문제가 얼마나 비싼가'를 달러/원 단위로 뽑아라. 반드시 web_search로 출처 검증. IR에만 근거하면 과대평가 위험. unmet_need_score는 cost×stakeholder 조합으로 냉정히 판정."
 }}
 ```
 

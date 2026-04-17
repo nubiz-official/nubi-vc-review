@@ -47,6 +47,10 @@ class Reporter:
             "investor_concern_validation": phase1.get("investor_concern_validation", []),
             "diligence_trigger_checklist": phase1.get("diligence_trigger_checklist", []),
             "nubiz_fit_leverage": phase1.get("nubiz_fit_leverage", []),
+            "executive_verdict": phase1.get("executive_verdict", {}),
+            "narrative_reframing": phase1.get("narrative_reframing", {}),
+            "deal_structuring_suggestions": phase1.get("deal_structuring_suggestions", []),
+            "problem_cost_severity": phase1.get("problem_cost_severity", {}),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -266,6 +270,10 @@ class Reporter:
         investor_concerns = report_final.get("investor_concern_validation", [])
         diligence_triggers = report_final.get("diligence_trigger_checklist", [])
         nubiz_fit = report_final.get("nubiz_fit_leverage", [])
+        exec_verdict = report_final.get("executive_verdict", {})
+        reframing = report_final.get("narrative_reframing", {})
+        deal_structures = report_final.get("deal_structuring_suggestions", [])
+        problem_cost = report_final.get("problem_cost_severity", {})
         appendix = report_final.get("appendix", {})
 
         # ─── Analysis Reference Point 헤더 ───
@@ -297,13 +305,34 @@ class Reporter:
 ### Headline
 {exec_summary.get('headline', 'N/A')}
 
+### 🎯 One-Line Verdict (임원용 의사결정 결론)
+> **{exec_verdict.get('one_line_verdict', 'N/A')}**
+>
+> - 결론 유형: `{exec_verdict.get('verdict_type', 'N/A')}`
+> - 최대 동인: {exec_verdict.get('key_driver', 'N/A')}
+
 ### Investment Case
 {exec_summary.get('investment_case', 'N/A')}
 
 **Recommendation:** {str(exec_summary.get('recommendation', '')).upper() or 'N/A'}
 **Risk Level:** {str(exec_summary.get('risk_level', '')).upper() or 'N/A'}
 
----
+"""
+        # ─── Narrative Reframing (Executive Summary 하단) ───
+        if isinstance(reframing, dict) and reframing and reframing.get("reframed_narrative"):
+            md += "\n### 📐 Narrative Reframing (투자자 언어 재정의)\n\n"
+            md += f"- **현재 내러티브:** {reframing.get('current_narrative', '')}\n"
+            md += f"- **리프레이밍:** **{reframing.get('reframed_narrative', '')}**\n"
+            if reframing.get("why_more_persuasive"):
+                md += f"- **왜 더 설득력 있는가:** {reframing.get('why_more_persuasive', '')}\n"
+            segs = reframing.get("applicable_segments", [])
+            if segs:
+                md += f"- **적중 투자자 유형:** {', '.join(str(s) for s in segs)}\n"
+            if reframing.get("caveat"):
+                md += f"- ⚠️ **한계:** {reframing.get('caveat', '')}\n"
+            md += "\n"
+
+        md += """---
 
 ## Numeric Reference Table (보고서 전체 숫자 기준표)
 
@@ -356,6 +385,29 @@ class Reporter:
                     md += f"- **[{sev.upper()}]** {desc}\n"
             else:
                 md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
+            md += "\n"
+
+        # ─── Problem Cost Severity (Risks 뒤) ───
+        if isinstance(problem_cost, dict) and problem_cost and problem_cost.get("annual_cost_magnitude"):
+            md += "---\n\n## Problem Cost Severity (문제의 경제적 부담)\n\n"
+            md += f"- **핵심 문제:** {problem_cost.get('problem_description', '')}\n"
+            md += f"- **연간 경제적 비용:** **{problem_cost.get('annual_cost_magnitude', '')}**\n"
+            if problem_cost.get("cost_basis"):
+                md += f"- **산출 근거:** {problem_cost.get('cost_basis', '')}\n"
+            if problem_cost.get("unmet_need_score"):
+                md += f"- **Unmet Need Score:** `{problem_cost.get('unmet_need_score', '')}`\n"
+
+            stakeholders = problem_cost.get("stakeholder_impact", [])
+            if isinstance(stakeholders, list) and stakeholders:
+                md += "\n### 이해관계자별 영향\n\n"
+                md += "| 이해관계자 | 구체 영향 |\n|---|---|\n"
+                for s in stakeholders:
+                    if isinstance(s, dict):
+                        md += f"| {s.get('stakeholder', '')} | {s.get('impact', '')} |\n"
+
+            sources = problem_cost.get("evidence_sources", [])
+            if isinstance(sources, list) and sources:
+                md += "\n**출처:** " + ", ".join(str(x) for x in sources) + "\n"
             md += "\n"
 
         # ─── Investor Concern Validation (Risks 뒤) ───
@@ -599,13 +651,15 @@ class Reporter:
         # ─── Nubiz Fit & Leverage (RWW 시나리오 뒤) ───
         if isinstance(nubiz_fit, list) and nubiz_fit:
             md += "---\n\n## Nubiz Fit & Leverage (회사 맞춤 역량 매칭)\n\n"
-            md += "> 누비즈가 이 회사에 실제로 어떤 기여를 할 수 있는지 회사 니즈별로 매칭했습니다.\n\n"
-            md += "| 회사 니즈 | 누비즈 역량 | 개입 방식 | 기대 산출물 | 90일 실행 가능성 |\n|---|---|---|---|---|\n"
+            md += "> 누비즈가 이 회사에 실제로 어떤 기여를 할 수 있는지 회사 니즈별로 매칭했습니다. 매칭 강도(별점) + 참조 누비즈 자산(P06/P07/P08/P09 등) 포함.\n\n"
+            md += "| 회사 니즈 | 누비즈 역량 | 참조 자산 | 매칭도 | 개입 방식 | 기대 산출물 | 90일 실행 |\n|---|---|---|---|---|---|---|\n"
             for f in nubiz_fit:
                 if isinstance(f, dict):
                     row = [
                         f.get("company_need", ""),
                         f.get("nubiz_capability", ""),
+                        f.get("nubiz_asset_reference", ""),
+                        f.get("match_strength", ""),
                         f.get("intervention_mode", ""),
                         f.get("expected_deliverable", ""),
                         f.get("feasibility_90d", "")
@@ -630,6 +684,24 @@ class Reporter:
                     ]
                     md += "| " + " | ".join(str(x) for x in row) + " |\n"
             md += "\n"
+
+        # ─── Deal Structuring Suggestions (Final Take 앞) ───
+        if isinstance(deal_structures, list) and deal_structures:
+            md += "---\n\n## Deal Structuring Suggestions (조건부 투자 구조 설계)\n\n"
+            md += "> 단순 go/no-go가 아니라 '어떻게 구조화해서 들어갈 것인가'를 설계한 대안 시나리오입니다.\n\n"
+            for i, d in enumerate(deal_structures, 1):
+                if isinstance(d, dict):
+                    md += f"### {i}. `{d.get('structure_type', '')}`\n"
+                    conds = d.get("conditions", [])
+                    if conds:
+                        md += "- **진입 조건:**\n"
+                        for c in conds:
+                            md += f"  - {c}\n"
+                    if d.get("rationale"):
+                        md += f"- **근거:** {d.get('rationale', '')}\n"
+                    if d.get("target_investors"):
+                        md += f"- **적합 투자자:** {d.get('target_investors', '')}\n"
+                    md += "\n"
 
         # ─── 3대 법칙 (Final Take) ───
         md += "---\n\n## Final Take — 누비즈 3대 법칙\n\n"
