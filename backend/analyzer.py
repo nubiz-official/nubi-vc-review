@@ -89,7 +89,8 @@ class Analyzer:
             "cross_validation": claude_analysis.get("cross_validation", []),
             "momentum_entry_timeline": claude_analysis.get("momentum_entry_timeline", {}),
             "rww_synergy_scenarios": claude_analysis.get("rww_synergy_scenarios", []),
-            "nubiz_laws": claude_analysis.get("nubiz_laws", [])
+            "nubiz_laws": claude_analysis.get("nubiz_laws", []),
+            "analysis_reference_point": claude_analysis.get("analysis_reference_point", {})
         }
 
         metadata.status_history.append({
@@ -124,6 +125,12 @@ class Analyzer:
 
 ```json
 {{
+  "analysis_reference_point": {{
+    "stance": "<둘 중 하나 선택: 'post_approval_reverse' (승인/IPO 후 역산 분석) 또는 'under_review_forward' (심사·성장 중 전망 분석)>",
+    "cutoff_date": "<IR 자료 기준 시점 (예: 2024.10 FDA De Novo 승인 시점)>",
+    "basis": "<판단 근거: IR 자료 내 가장 최신 이벤트 (예: 2024.10 FDA 승인 확정) 또는 심사 진행 상태 (예: 2024.03 De Novo 제출, 심사 중)>",
+    "disclosure": "<독자 경고 1문장. 예: '본 보고서는 FDA 승인 확정 이후의 역산 관점이며, 모든 시점·수치는 승인 확정된 사실에 기반함.' 또는 '본 보고서는 심사 진행 중 상태의 전망 관점이며, 최종 결과는 확정되지 않았음.'>"
+  }},
   "headline": "<회사명>: <한 줄 투자 판단>",
   "investment_case": "<3-5문장 투자 논리. 구체 수치/규제명/플랫폼 포함>",
   "investment_decision": "<strong_buy|buy|hold|strong_avoid>",
@@ -155,9 +162,25 @@ class Analyzer:
   "stage_5_RWW개입": {{"score": <0-10 숫자>, "evidence": ["<해외 매출 비중(%) — IR 원문에서 숫자 인용>", "<글로벌 실행력 근거: 진출 국가 수, 해외 임상, 해외 파트너십 등>", "<NuBIZ 개입 시 기대 효과>"], "confidence": <0-1>}},
 
   "cross_validation": [
-    {{"company": "Intuitive Surgical (ISRG)", "similarity": "<비교 근거>", "outcome": "<실적 팩트>", "relevance_to_subject": "<이 회사에의 시사점>"}},
-    {{"company": "PROCEPT BioRobotics (PRCT)", "similarity": "<비교 근거>", "outcome": "<실적 팩트>", "relevance_to_subject": "<시사점>"}}
+    {{
+      "company": "<회사명 + 티커 예: Intuitive Surgical (ISRG)>",
+      "ipo_year": "<IPO 연도>",
+      "regulatory_pathway": "<규제 경로명 예: FDA PMA / De Novo / 510(k) / CE>",
+      "revenue_model": "<매출 구조 예: razor-blade (소모품 70%+), SaaS recurring, hardware only>",
+      "market_cap_current": "<현재 시가총액 또는 인수가 예: $60B+, 인수 $3.2B>",
+      "similarity_dimensions": ["<이 회사와 공유하는 성공 패턴 1 예: 반복매출 모델>", "<패턴 2 예: 규제 해자>", "<패턴 3 예: 플랫폼 확장>"],
+      "key_outcome_metric": "<핵심 실적 지표 1개 예: 10%+ YoY 25년 지속 / 영업이익률 51%+>",
+      "applicability_to_subject": "<이 회사에 주는 시사점 구체 기술>"
+    }},
+    {{
+      "company": "<두 번째 비교 회사>",
+      "ipo_year": "<연도>", "regulatory_pathway": "<경로>", "revenue_model": "<구조>", "market_cap_current": "<시총>",
+      "similarity_dimensions": ["<공유 패턴>", "<공유 패턴>"],
+      "key_outcome_metric": "<지표>",
+      "applicability_to_subject": "<시사점>"
+    }}
   ],
+  "// cross_validation 규칙": "최소 2개, 권장 3-4개. 각 회사는 regulatory_pathway/revenue_model/market_cap_current 3개 팩트 필드를 반드시 채우되, web_search로 검증되지 않은 수치는 '[추정]' 라벨을 붙여라. similarity_dimensions는 해당 회사와 실제로 공유하는 성공 패턴만 포함 (억지 유사성 금지).",
 
   "risks": [
     {{"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정 여부와 적응증 범위 제한 (예: 특정 시술로만 승인) 구체 기술. IR에서 언급된 제품명/적응증 인용 필수", "severity": "high|medium|low"}},
@@ -190,13 +213,13 @@ class Analyzer:
   "// momentum_entry_timeline 규칙": "각 배열은 최소 2개 이상의 시점 이벤트를 포함하라. IR에서 연도/시점 근거를 찾을 수 없으면 'IR 미기재'라고 명시하라.",
 
   "rww_synergy_scenarios": [
-    {{"intervention_area": "규제 문서 자동화", "expected_effect": "<회사 맥락에 맞는 기대 효과 예: FDA/CE 문서 생성 시간 60% 단축>", "value_increment_basis": "<가치 증분 근거 예: 인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생>"}},
-    {{"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>"}},
-    {{"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<영업이익률 개선 근거>"}},
-    {{"intervention_area": "IR 데이터 자동 생성", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<투자자 커뮤니케이션/자금조달 비용 절감 근거>"}},
-    {{"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<IP 가치 보전/방어 근거>"}}
+    {{"intervention_area": "규제 문서 자동화", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<예: '[가정] NuBIZ 자체 벤치마크 기준 60% 단축 가정치. 실측 미검증.' — 모든 수치에 가정/추정 근거 명시>"}},
+    {{"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<영업이익률 개선 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "IR 데이터 자동 생성", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<자금조달 비용 절감 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<IP 가치 보전/방어 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}}
   ],
-  "// rww_synergy_scenarios 규칙": "5개 영역 모두 포함하라. 회사가 해당 영역과 무관하면 '해당 없음'이라고 명시하되, 가능한 경우 회사의 실제 제품/파이프라인에 맞춰 구체화하라.",
+  "// rww_synergy_scenarios 규칙": "5개 영역 모두 포함. expected_effect/value_increment_basis에 숫자(%·월·배수 등)가 들어가면 반드시 '[가정]' 또는 '[추정]' 또는 '[벤치마크]' 접두어를 붙이고, estimate_note에 근거/출처를 1문장으로 명시하라. 실측 데이터가 아닌 경우 반드시 라벨링하여 오독 방지.",
 
   "nubiz_laws": [
     {{"law": "<한 문장 법칙 예: '기술이 아니라 제어력이 상장한다'>", "evidence_for_company": "<회사에 적용된 증거 예: 경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, FDA 재현성 요건 충족>"}},

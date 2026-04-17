@@ -42,6 +42,7 @@ class Reporter:
             "momentum_entry_timeline": phase1.get("momentum_entry_timeline", {}),
             "rww_synergy_scenarios": phase1.get("rww_synergy_scenarios", []),
             "nubiz_laws": phase1.get("nubiz_laws", []),
+            "analysis_reference_point": phase1.get("analysis_reference_point", {}),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -254,13 +255,30 @@ class Reporter:
         momentum = report_final.get("momentum_entry_timeline", {})
         rww_scenarios = report_final.get("rww_synergy_scenarios", [])
         laws = report_final.get("nubiz_laws", [])
+        ref_point = report_final.get("analysis_reference_point", {})
         appendix = report_final.get("appendix", {})
+
+        # ─── Analysis Reference Point 헤더 ───
+        stance_label = {
+            "post_approval_reverse": "승인/IPO 후 역산 분석 (Post-Approval Reverse-Engineering)",
+            "under_review_forward": "심사 중 전망 분석 (Under-Review Forward-Looking)"
+        }
+        stance = ref_point.get("stance", "") if isinstance(ref_point, dict) else ""
+        stance_text = stance_label.get(stance, stance or "분석 관점 미기재")
+        cutoff = ref_point.get("cutoff_date", "") if isinstance(ref_point, dict) else ""
+        basis = ref_point.get("basis", "") if isinstance(ref_point, dict) else ""
+        disclosure = ref_point.get("disclosure", "") if isinstance(ref_point, dict) else ""
 
         md = f"""# NuBI VC Review Report
 ## {company_name}
 
 **Report Generated:** {report_final.get('generated_at', 'N/A')}
 **Report ID:** {report_final.get('report_id', 'N/A')}
+
+> **분석 관점:** {stance_text}
+> **IR 기준 시점:** {cutoff or 'N/A'}
+> **판단 근거:** {basis or 'N/A'}
+> **독자 경고:** {disclosure or '분석 관점이 명시되지 않음. 수치 해석 시 주의.'}
 
 ---
 
@@ -329,15 +347,37 @@ class Reporter:
 ## Cross Validation
 
 """
-        if isinstance(cross_val, list):
+        if isinstance(cross_val, list) and cross_val:
+            md += "| 회사 | IPO 연도 | 규제 경로 | 매출 모델 | 시가총액 | 핵심 성과 지표 |\n"
+            md += "|---|---|---|---|---|---|\n"
             for c in cross_val:
                 if isinstance(c, dict):
-                    md += f"- **{c.get('company', c.get('name', 'N/A'))}**: {c.get('outcome', c.get('similarity', c.get('relevance_to_subject', '')))}\n"
-                else:
-                    md += f"- {c}\n"
+                    row = [
+                        c.get("company", c.get("name", "N/A")),
+                        c.get("ipo_year", ""),
+                        c.get("regulatory_pathway", ""),
+                        c.get("revenue_model", ""),
+                        c.get("market_cap_current", ""),
+                        c.get("key_outcome_metric", c.get("outcome", ""))
+                    ]
+                    md += "| " + " | ".join(str(x) for x in row) + " |\n"
+            md += "\n### 유사성 차원 및 시사점\n\n"
+            for c in cross_val:
+                if isinstance(c, dict):
+                    name = c.get("company", "N/A")
+                    dims = c.get("similarity_dimensions", [])
+                    app = c.get("applicability_to_subject", c.get("relevance_to_subject", ""))
+                    md += f"**{name}**\n"
+                    if dims:
+                        md += f"- 공유 성공 패턴: {', '.join(str(d) for d in dims)}\n"
+                    if app:
+                        md += f"- 시사점: {app}\n"
+                    md += "\n"
         elif isinstance(cross_val, dict):
             for c in cross_val.get("comparable_companies", []):
                 md += f"- **{c.get('company', 'N/A')}**: {c.get('outcome', '')}\n"
+        else:
+            md += "(Cross Validation 데이터 없음)\n\n"
 
         # ─── Risks Section ───
         md += "\n---\n\n## Risks (필수 3종)\n\n"
@@ -434,14 +474,17 @@ class Reporter:
 
         # ─── RWW 퀀텀 점프 시나리오 ───
         md += "\n---\n\n## NuBIZ RWW 플랫폼 적용 시 기업가치 퀀텀 점프 시나리오\n\n"
+        md += "> ⚠️ 본 섹션의 수치는 RWW 벤치마크 기반 **가정/추정치**이며 실측 데이터가 아닙니다. `[가정]`/`[추정]`/`[벤치마크]` 라벨과 estimate_note를 함께 확인하세요.\n\n"
         if isinstance(rww_scenarios, list) and rww_scenarios:
-            md += "| RWW 개입 영역 | 기대 효과 | 가치 증분 근거 |\n|---|---|---|\n"
+            md += "| RWW 개입 영역 | 기대 효과 | 가치 증분 근거 | 근거 유형 | 산출 근거 |\n|---|---|---|---|---|\n"
             for s in rww_scenarios:
                 if isinstance(s, dict):
                     area = s.get("intervention_area", "")
                     eff = s.get("expected_effect", "")
                     val = s.get("value_increment_basis", "")
-                    md += f"| {area} | {eff} | {val} |\n"
+                    est_type = s.get("estimate_type", "")
+                    est_note = s.get("estimate_note", "")
+                    md += f"| {area} | {eff} | {val} | `{est_type}` | {est_note} |\n"
             md += "\n"
         else:
             md += "(RWW 시너지 시나리오 데이터 없음)\n\n"

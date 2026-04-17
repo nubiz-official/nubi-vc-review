@@ -12,6 +12,12 @@ if sys.stdout.encoding != 'utf-8':
 
 
 MOCK_CLAUDE_JSON = {
+    "analysis_reference_point": {
+        "stance": "post_approval_reverse",
+        "cutoff_date": "2024.10 FDA De Novo 승인 시점",
+        "basis": "IR 최신 이벤트가 2024.10 FDA De Novo 승인 (KBR 보도 확인). 상장/승인 확정 사실 기반 역산.",
+        "disclosure": "본 보고서는 FDA 승인 확정 이후의 역산 관점이며, 모든 시점·수치는 승인 확정 사실에 기반함."
+    },
     "headline": "Recens Medical: B+-Grade Investment — HIFU 플랫폼의 FDA De Novo 경로 확정 + 소모품 20% 구조",
     "investment_case": "Recens Medical은 HIFU 기반 정맥 치료 플랫폼으로 FDA De Novo 경로를 6년간 준비하여 임상 1000+ 케이스를 확보했다. 2017년 창업 이후 모듈형 아키텍처로 소모품 매출 비중 20%를 설계했으며, 규제 실행 조직을 선배치했다. 경쟁사 Intuitive Surgical 대비 적응증 특화로 non-inferiority 확보 가능.",
     "investment_decision": "buy",
@@ -55,11 +61,11 @@ MOCK_CLAUDE_JSON = {
         }
     },
     "rww_synergy_scenarios": [
-        {"intervention_area": "규제 문서 자동화", "expected_effect": "FDA/CE/KGMP 문서 생성 시간 60% 단축", "value_increment_basis": "인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생"},
-        {"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "20개국 인증을 체계적으로 추적/관리", "value_increment_basis": "시장 진입 속도 × 매출 = 밸류에이션 프리미엄"},
-        {"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "총판별 재구매 패턴 분석 → 재고/생산 최적화", "value_increment_basis": "영업이익률 추가 5~10%p 개선 가능"},
-        {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감"},
-        {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "IP 가치 보전 및 방어적 라이센싱 수익"}
+        {"intervention_area": "규제 문서 자동화", "expected_effect": "[가정] FDA/CE/KGMP 문서 생성 시간 60% 단축", "value_increment_basis": "[가정] 인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생", "estimate_type": "assumption", "estimate_note": "NuBIZ 내부 벤치마크 기반 가정치. 실측 미검증."},
+        {"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "[추정] 20개국 인증을 체계적으로 추적/관리", "value_increment_basis": "[추정] 시장 진입 속도 × 매출 = 밸류에이션 프리미엄", "estimate_type": "estimate", "estimate_note": "회사의 기존 20개국 인증 실적 기반 추정."},
+        {"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "[가정] 총판별 재구매 패턴 분석 → 재고/생산 최적화", "value_increment_basis": "[가정] 영업이익률 추가 5~10%p 개선 가능", "estimate_type": "assumption", "estimate_note": "경쟁사 razor-blade 모델 벤치마크 기반 가정. 회사 고유 상황 미반영."},
+        {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "[추정] 실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "[추정] 투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감", "estimate_type": "estimate", "estimate_note": "정성적 효과. 정량 지표 미산출."},
+        {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "[벤치마크] 150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "[추정] IP 가치 보전 및 방어적 라이센싱 수익", "estimate_type": "benchmark_based", "estimate_note": "회사 실제 특허 건수(IR 기재) 기반. 라이센싱 수익은 추정."}
     ],
     "nubiz_laws": [
         {"law": "기술이 아니라 제어력이 상장한다", "evidence_for_company": "경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, -50℃~+5℃ 범위 제어가 FDA 재현성 요건을 충족"},
@@ -72,8 +78,26 @@ MOCK_CLAUDE_JSON = {
     "stage_4_반복매출": {"score": 8.5, "evidence": ["소모품 매출 비중 20%, 유지보수 계약 설계"], "confidence": 0.9},
     "stage_5_RWW개입": {"score": 8.0, "evidence": ["해외 매출 비중 90% (IR 2024 연결재무제표)", "글로벌 실행력: 미국/유럽/일본 진출, 해외 임상 3건", "NuBIZ 개입 시 아시아 판로 확장 기대"], "confidence": 0.8},
     "cross_validation": [
-        {"company": "Intuitive Surgical (ISRG)", "similarity": "소모품 비중 높은 medtech", "outcome": "IPO 2000, $60B+ 시총", "relevance_to_subject": "소모품 중심 medtech IPO 가능성 입증"},
-        {"company": "PROCEPT BioRobotics (PRCT)", "similarity": "FDA De Novo 경로 활용", "outcome": "IPO 2021, $100M+ 매출", "relevance_to_subject": "De Novo 경로 IPO 가속 사례"}
+        {
+            "company": "Intuitive Surgical (ISRG)",
+            "ipo_year": "2000",
+            "regulatory_pathway": "FDA PMA",
+            "revenue_model": "razor-blade (소모품 70%+)",
+            "market_cap_current": "$60B+",
+            "similarity_dimensions": ["반복매출 모델", "규제 해자", "플랫폼 확장"],
+            "key_outcome_metric": "10%+ YoY 25년 지속",
+            "applicability_to_subject": "소모품 중심 medtech의 장기 IPO/시총 확장 모델 입증"
+        },
+        {
+            "company": "PROCEPT BioRobotics (PRCT)",
+            "ipo_year": "2021",
+            "regulatory_pathway": "FDA De Novo",
+            "revenue_model": "razor-blade (디바이스+소모품)",
+            "market_cap_current": "[추정] $2B+ (2024년 기준)",
+            "similarity_dimensions": ["FDA De Novo 경로", "소모품 반복매출"],
+            "key_outcome_metric": "IPO 후 $100M+ 매출 달성",
+            "applicability_to_subject": "De Novo 경로가 IPO 가속 장치가 된 최근 사례. 리센스의 De Novo 전략과 직접 비교 가능."
+        }
     ],
     "risks": [
         {"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정, 적응증 범위 제한 (OcuCool → IVT만 승인)", "severity": "high"},
@@ -234,6 +258,40 @@ def run_mock():
     for k, v in wave1d_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [W1-E] 분석 기준 시점 통일 확인 ---")
+    wave1e_checks = {
+        "분석 관점 헤더": "분석 관점" in md,
+        "승인 후 역산 라벨": "승인/IPO 후 역산" in md or "Post-Approval" in md,
+        "IR 기준 시점": "2024.10" in md,
+        "독자 경고": "독자 경고" in md and "승인 확정" in md,
+    }
+    for k, v in wave1e_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-F] RWW 시나리오 가정/추정 라벨 확인 ---")
+    wave1f_checks = {
+        "[가정] 라벨": "[가정]" in md,
+        "[추정] 라벨": "[추정]" in md,
+        "[벤치마크] 라벨": "[벤치마크]" in md,
+        "근거 유형 컬럼": "근거 유형" in md,
+        "산출 근거 컬럼": "산출 근거" in md,
+        "경고 문구": "가정/추정치" in md,
+    }
+    for k, v in wave1f_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-G] Cross Validation 구조화 확인 ---")
+    wave1g_checks = {
+        "표 헤더 (IPO 연도)": "IPO 연도" in md,
+        "표 헤더 (규제 경로)": "규제 경로" in md and "FDA PMA" in md,
+        "표 헤더 (매출 모델)": "razor-blade" in md,
+        "시가총액 컬럼": "$60B+" in md,
+        "유사성 차원 섹션": "유사성 차원 및 시사점" in md,
+        "공유 성공 패턴": "공유 성공 패턴" in md,
+    }
+    for k, v in wave1g_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n" + "=" * 70)
     forbidden = ["Analyzed from IR materials", "Product Market Fit", "Regulatory Pathway Clarity",
                  "Revenue Growth Trajectory", "Team Expansion"]
@@ -247,6 +305,9 @@ def run_mock():
     all_w1b = all(wave1b_checks.values())
     all_w1c = all(wave1c_checks.values())
     all_w1d = all(wave1d_checks.values())
+    all_w1e = all(wave1e_checks.values())
+    all_w1f = all(wave1f_checks.values())
+    all_w1g = all(wave1g_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -265,8 +326,14 @@ def run_mock():
         print("FAIL: Wave 1-C (RWW 시나리오) 누락")
     elif not all_w1d:
         print("FAIL: Wave 1-D (3대 법칙) 누락")
+    elif not all_w1e:
+        print("FAIL: Wave 1-E (분석 기준 시점 통일) 누락")
+    elif not all_w1f:
+        print("FAIL: Wave 1-F (RWW 가정/추정 라벨) 누락")
+    elif not all_w1g:
+        print("FAIL: Wave 1-G (Cross Validation 구조화) 누락")
     else:
-        print("PASS: 모든 항목 + Wave 1 4개 섹션 모두 정상")
+        print("PASS: 모든 항목 + Wave 1 (A/B/C/D) + 즉시 다듬기 (E/F/G) 전부 정상")
     print("=" * 70)
 
 
