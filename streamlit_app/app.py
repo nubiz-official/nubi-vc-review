@@ -527,20 +527,20 @@ if run_clicked:
     # Extract text from uploaded files
     with st.spinner("IR 자료 읽는 중..."):
         all_text = []
+        file_texts = []
         for uf in ir_files:
             lower_name = uf.name.lower()
             if lower_name.endswith(".pdf"):
                 text = extract_pdf_text(uf.getvalue())
-                all_text.append(f"=== {uf.name} ===\n{text}")
             elif lower_name.endswith(".docx"):
                 text = extract_docx_text(uf.getvalue())
-                all_text.append(f"=== {uf.name} ===\n{text}")
             else:
                 try:
                     text = uf.getvalue().decode("utf-8", errors="replace")
-                    all_text.append(f"=== {uf.name} ===\n{text}")
                 except Exception:
-                    all_text.append(f"=== {uf.name} === (읽기 실패)")
+                    text = ""
+            file_texts.append(text)
+            all_text.append(f"=== {uf.name} ===\n{text}")
 
         ir_text = "\n\n".join(all_text)
 
@@ -568,6 +568,7 @@ if run_clicked:
                 "filename": uf.name,
                 "filetype": uf.name.split(".")[-1].lower(),
                 "size_bytes": uf.size,
+                "text": file_texts[i],
                 "base64_content": __import__('base64').b64encode(uf.getvalue()).decode('utf-8'),
                 "doc_type": "ir_deck",
                 "confidence": 0.9
