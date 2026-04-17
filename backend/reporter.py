@@ -56,70 +56,17 @@ class Reporter:
         }
 
     def _generate_executive_summary(self, company_name: str, phase1: Dict[str, Any], phase2: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate executive summary."""
-        scores = phase1.get("scores", {})
-        overall = scores.get("overall", {})
-        grade = overall.get("grade", "C")
-
-        headline = f"{company_name}: {grade}-Grade Investment Opportunity with Conditional Support"
-
-        investment_case = f"""{company_name} presents a {grade}-grade investment opportunity.
-        The company demonstrates solid fundamentals across technology control, regulatory pathway, platform expansion, recurring revenue model, and execution capability (5-stage NuBIZ framework).
-        Key success factors include IP moat validation, regulatory strategy clarity, market scalability, revenue sustainability, and team execution."""
-
-        # Engine limitation notice (v2 framework)
-        engine_notice = """⚠️ **ANALYSIS ENGINE NOTICE (v2.0):**
-- Current engine is a rule/keyword-assisted NuBIZ 5-stage framework (not IPO reverse-engineering)
-- Recens Medical success factor integration (v3) planned for next version
-- This is internal review draft; regulatory/recurring revenue/comparative analysis requires human validation"""
-
-        # Determine recommendation based on grade
-        grade_map = {"A": "strong_buy", "B": "buy", "C": "hold", "D": "strong_avoid"}
-        risk_map = {"A": "low", "B": "medium", "C": "high", "D": "critical"}
-
+        """Use phase1 Claude output directly. No hardcoded templates."""
         return {
-            "headline": headline[:200],
-            "investment_case": investment_case,
-            "engine_notice": engine_notice,
-            "key_recommendation": grade_map.get(grade, "hold"),
-            "risk_level": risk_map.get(grade, "high")
+            "headline": phase1.get("headline", ""),
+            "investment_case": phase1.get("investment_case", phase1.get("investment_thesis", "")),
+            "recommendation": phase1.get("investment_decision", ""),
+            "risk_level": phase1.get("risk_level", "")
         }
 
     def _generate_early_indicators(self, phase1: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate early indicators (success milestones)."""
-        return {
-            "indicators": [
-                {
-                    "indicator_name": "Product Market Fit Validation",
-                    "current_status": "In progress",
-                    "target_status": "Customer retention rate > 80%",
-                    "timeline": "Next 6 months",
-                    "criticality": "must_have"
-                },
-                {
-                    "indicator_name": "Regulatory Pathway Clarity",
-                    "current_status": "Initiated",
-                    "target_status": "Regulatory approval/pathway confirmed",
-                    "timeline": "Next 12 months",
-                    "criticality": "must_have"
-                },
-                {
-                    "indicator_name": "Revenue Growth Trajectory",
-                    "current_status": "Early stage",
-                    "target_status": "20%+ month-over-month growth",
-                    "timeline": "Next 9 months",
-                    "criticality": "should_have"
-                },
-                {
-                    "indicator_name": "Team Expansion",
-                    "current_status": "Current size documented",
-                    "target_status": "Core team +50% capacity",
-                    "timeline": "Next 12 months",
-                    "criticality": "should_have"
-                }
-            ],
-            "count": 4
-        }
+        """Return Claude's early_indicators verbatim. No hardcoded templates."""
+        return phase1.get("early_indicators", [])
 
     def _generate_5stage_scorecard(self, company_name: str, phase1: Dict[str, Any]) -> Dict[str, Any]:
         """Generate NuBI's proprietary 5-stage scorecard from analyzer scores."""
@@ -188,7 +135,11 @@ class Reporter:
         }
 
     def _generate_cross_validation(self, company_name: str, phase1: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate cross-validation with comparable companies."""
+        """Return Claude's cross_validation verbatim. No hardcoded templates."""
+        return phase1.get("cross_validation", [])
+
+    def _generate_cross_validation_OLD_UNUSED(self, company_name: str, phase1: Dict[str, Any]) -> Dict[str, Any]:
+        """DEPRECATED - kept to preserve method boundary only."""
         return {
             "comparable_companies": [
                 {
@@ -297,10 +248,11 @@ class Reporter:
         }
 
     def _generate_markdown(self, report_final: Dict[str, Any], company_name: str) -> str:
-        """Generate markdown version of report."""
+        """Generate markdown version of report using Claude API phase1 data."""
         exec_summary = report_final.get("executive_summary", {})
-        early_ind = report_final.get("early_indicators", {})
+        early_ind = report_final.get("early_indicators", [])
         scorecard = report_final.get("5stage_scorecard", {})
+        cross_val = report_final.get("cross_validation", [])
         appendix = report_final.get("appendix", {})
 
         md = f"""# NuBI VC Review Report
@@ -319,21 +271,25 @@ class Reporter:
 ### Investment Case
 {exec_summary.get('investment_case', 'N/A')}
 
-**Recommendation:** {exec_summary.get('key_recommendation', 'hold').upper()}
-**Risk Level:** {exec_summary.get('risk_level', 'medium').upper()}
-
-### ⚠️ Analysis Engine Notice
-{exec_summary.get('engine_notice', 'Engine notice unavailable')}
+**Recommendation:** {str(exec_summary.get('recommendation', '')).upper() or 'N/A'}
+**Risk Level:** {str(exec_summary.get('risk_level', '')).upper() or 'N/A'}
 
 ---
 
 ## Early Indicators
 
-Milestones to track over next 12 months:
-
 """
-        for ind in early_ind.get("indicators", []):
-            md += f"- **{ind.get('indicator_name')}**: {ind.get('current_status')} → {ind.get('target_status')}\n"
+        if isinstance(early_ind, list):
+            for ind in early_ind:
+                if isinstance(ind, dict):
+                    name = ind.get("indicator_name") or ind.get("name") or ind.get("indicator") or ""
+                    desc = ind.get("description") or ind.get("current_status") or ind.get("status") or ""
+                    md += f"- **{name}**: {desc}\n"
+                else:
+                    md += f"- {ind}\n"
+        elif isinstance(early_ind, dict):
+            for ind in early_ind.get("indicators", []):
+                md += f"- **{ind.get('indicator_name')}**: {ind.get('current_status')} → {ind.get('target_status')}\n"
 
         md += f"""
 ---
@@ -347,6 +303,14 @@ Milestones to track over next 12 months:
             stage = scorecard.get(stage_key, {})
             md += f"| {stage_key.replace('stage_', '').replace('_', ' ')} | {stage.get('score', 0):.1f}/10 | {stage.get('description', 'N/A')} |\n"
 
+        md += "\n### Stage Evidence\n\n"
+        for stage_key in ["stage_1_원천기술통제", "stage_2_규제통제", "stage_3_플랫폼확장", "stage_4_반복매출", "stage_5_RWW개입"]:
+            stage = scorecard.get(stage_key, {})
+            md += f"**{stage_key}** ({stage.get('score', 0):.1f}/10):\n"
+            for ev in stage.get("evidence", []):
+                md += f"- {ev}\n"
+            md += "\n"
+
         md += f"""
 **Overall Score:** {scorecard.get('overall_score', 0):.1f}/10
 
@@ -354,14 +318,22 @@ Milestones to track over next 12 months:
 
 ## Cross Validation
 
-Similar companies and outcomes used for validation.
+"""
+        if isinstance(cross_val, list):
+            for c in cross_val:
+                if isinstance(c, dict):
+                    md += f"- **{c.get('company', c.get('name', 'N/A'))}**: {c.get('outcome', c.get('similarity', c.get('relevance_to_subject', '')))}\n"
+                else:
+                    md += f"- {c}\n"
+        elif isinstance(cross_val, dict):
+            for c in cross_val.get("comparable_companies", []):
+                md += f"- **{c.get('company', 'N/A')}**: {c.get('outcome', '')}\n"
+
+        md += f"""
 
 ---
 
-## Appendix: Domain Logic Status
-
-### Framework Limitations in v2
-The following domain logics are deferred to v3 (next release):
+## Appendix
 
 """
         for gap in appendix.get("domain_logic_gaps", []):
@@ -380,12 +352,6 @@ The following domain logics are deferred to v3 (next release):
 
 ---
 
-## Scope & Limitations
-
-This analysis is based on provided materials and does not constitute investment advice.
-
----
-
-*Generated by NuBI VC Review System v2.0 (Beta)*
+*Generated by NuBI VC Review (Claude API v3.0)*
 """
         return md

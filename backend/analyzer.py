@@ -11,8 +11,8 @@ class Analyzer:
     """Claude API-powered Phase 1 analysis engine."""
 
     def __init__(self, model_version: str = "claude-opus-4-7", prompt_version: str = "v2.0.0"):
-        """Initialize analyzer with Anthropic client."""
-        self.model_version = model_version
+        """Initialize analyzer with Anthropic client. Model is fixed to claude-opus-4-7."""
+        self.model_version = "claude-opus-4-7"
         self.prompt_version = prompt_version
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
@@ -63,7 +63,7 @@ class Analyzer:
         claude_analysis = self._run_claude_analysis(input_data)
         timestamp_completed = datetime.utcnow().isoformat()
 
-        # Build phase1_analysis from Claude output
+        # Build phase1_analysis from Claude output (pass-through Claude JSON fields)
         phase1 = {
             "timestamp_started": timestamp_started,
             "timestamp_completed": timestamp_completed,
@@ -71,7 +71,11 @@ class Analyzer:
             "prompt_version": self.prompt_version,
             "scores": self._extract_scores_from_claude(claude_analysis),
             "narrative_analysis": self._extract_narratives_from_claude(claude_analysis),
+            "headline": claude_analysis.get("headline", ""),
+            "investment_case": claude_analysis.get("investment_case", claude_analysis.get("investment_thesis", "")),
             "investment_thesis": claude_analysis.get("investment_thesis", ""),
+            "investment_decision": claude_analysis.get("investment_decision", claude_analysis.get("recommendation", "")),
+            "risk_level": claude_analysis.get("risk_level", ""),
             "key_risks": claude_analysis.get("risks", []),
             "red_flags": self._extract_red_flags(claude_analysis),
             "missing_information": claude_analysis.get("missing_information", []),
@@ -81,7 +85,8 @@ class Analyzer:
                 "assessment": "High quality source materials provided"
             },
             "factor_discovery": claude_analysis.get("factor_discovery", {}),
-            "early_indicators": claude_analysis.get("early_indicators", [])
+            "early_indicators": claude_analysis.get("early_indicators", []),
+            "cross_validation": claude_analysis.get("cross_validation", [])
         }
 
         metadata.status_history.append({
@@ -111,40 +116,55 @@ class Analyzer:
 [IR 자료]
 {doc_text[:8000]}
 
-다음을 수행하라:
+다음 JSON 스키마를 정확히 따라 응답하라. 모든 evidence 필드는 반드시 문자열 배열(list of strings)이다.
+모든 근거는 IR 자료 원문에서 인용하거나, web_search로 검증된 사실만 기술하라.
 
-1. FACTOR DISCOVERY
-   - 이 회사의 핵심 기술이 어떤 플랫폼으로 진화 가능한가
-   - 규제 경로(FDA De Novo/510k/PMA/CE 등)가 명확한가
-   - 반복매출 구조(소모품/구독)가 설계되어 있는가
-   - 2017→IPO 역산 가능한 팩터 3개를 찾아라
+```json
+{{
+  "headline": "<회사명>: <한 줄 투자 판단>",
+  "investment_case": "<3-5문장 투자 논리. 구체 수치/규제명/플랫폼 포함>",
+  "investment_decision": "<strong_buy|buy|hold|strong_avoid>",
+  "risk_level": "<low|medium|high|critical>",
+  "investment_thesis": "<핵심 강점과 약점 정리>",
 
-2. EARLY INDICATORS (3개 기준으로 평가)
-   - 원천기술의 물리적 제어 가능성
-   - 규제 실행 조직의 선배치 여부
-   - 제품 아키텍처의 모듈화/소모품 설계
+  "factor_discovery": {{
+    "platform_evolution": "<핵심 기술의 플랫폼 확장 가능성>",
+    "regulatory_pathway": "<FDA De Novo/510k/PMA/CE 등 구체 경로>",
+    "recurring_revenue": "<소모품/구독 구조 설계 유무와 근거>",
+    "ipo_factors": ["<2017→IPO 역산 팩터 1>", "<팩터 2>", "<팩터 3>"]
+  }},
 
-3. 5단계 채점 (각 근거 문장 포함)
-   - 원천기술통제: 구체적 근거와 점수 (0-10)
-   - 규제통제: 규제 경로명 명시, 점수
-   - 플랫폼확장: 적용 가능 영역 수, 점수
-   - 반복매출: 소모품 비중/구독 구조, 점수
-   - RWW개입: NuBIZ 개입 시 기대 효과, 점수
+  "early_indicators": [
+    {{"indicator_name": "원천기술 물리적 제어 가능성", "description": "<IR 근거 인용 구체 문장>"}},
+    {{"indicator_name": "규제 실행 조직 선배치", "description": "<IR 근거 인용 구체 문장>"}},
+    {{"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "description": "<IR 근거 인용 구체 문장>"}}
+  ],
 
-4. CROSS VALIDATION (웹 검색으로 확인)
-   - "{company_name} FDA approval" 검색
-   - 경쟁사(Intuitive Surgical, PROCEPT 등) 실적 검색
-   - 규제 승인 사실 교차검증
+  "stage_1_원천기술통제": {{"score": <0-10 숫자>, "evidence": ["<근거 문장 1>", "<근거 문장 2>"], "confidence": <0-1>}},
+  "stage_2_규제통제": {{"score": <0-10 숫자>, "evidence": ["<FDA 경로명 포함 근거>"], "confidence": <0-1>}},
+  "stage_3_플랫폼확장": {{"score": <0-10 숫자>, "evidence": ["<적용 가능 영역 수와 근거>"], "confidence": <0-1>}},
+  "stage_4_반복매출": {{"score": <0-10 숫자>, "evidence": ["<소모품 비중/구독 구조 근거>"], "confidence": <0-1>}},
+  "stage_5_RWW개입": {{"score": <0-10 숫자>, "evidence": ["<NuBIZ 개입 시 기대 효과>"], "confidence": <0-1>}},
 
-5. RISK
-   - 규제 적응증 범위 제한
-   - 임상 데이터 한계
-   - 선반영된 낙관적 가정
+  "cross_validation": [
+    {{"company": "Intuitive Surgical (ISRG)", "similarity": "<비교 근거>", "outcome": "<실적 팩트>", "relevance_to_subject": "<이 회사에의 시사점>"}},
+    {{"company": "PROCEPT BioRobotics (PRCT)", "similarity": "<비교 근거>", "outcome": "<실적 팩트>", "relevance_to_subject": "<시사점>"}}
+  ],
 
-6. 투자 테시스
-   - 회사의 핵심 강점과 약점 정리
+  "risks": [
+    {{"risk_type": "regulatory", "description": "<규제 적응증 범위 제한 구체 기술>", "severity": "high|medium|low"}},
+    {{"risk_type": "clinical", "description": "<임상 데이터 한계 구체 기술>", "severity": "high|medium|low"}},
+    {{"risk_type": "valuation", "description": "<선반영된 낙관적 가정>", "severity": "high|medium|low"}}
+  ],
 
-JSON 형식으로 반환하라."""
+  "missing_information": [
+    {{"category": "<카테고리>", "criticality": "critical|important|nice_to_have", "impact": "<왜 중요한가>"}}
+  ]
+}}
+```
+
+web_search 도구를 활용해 "{company_name} FDA approval", 경쟁사 실적, 규제 승인 사실을 반드시 교차검증하라.
+응답은 위 JSON 스키마만 포함하라. 다른 텍스트 금지."""
 
         try:
             tools = [
@@ -211,18 +231,15 @@ JSON 형식으로 반환하라."""
             raise RuntimeError(f"Claude API call failed: {e}")
 
     def _parse_claude_text_response(self, text: str) -> Dict[str, Any]:
-        """Parse Claude's text response into structured format."""
-        return {
-            "factor_discovery": {"analysis": text[:1000]},
-            "early_indicators": ["Preliminary analysis based on IR materials"],
-            "stage_1_원천기술통제": {"score": 7.0, "evidence": ["Analyzed from IR materials"], "confidence": 0.85},
-            "stage_2_규제통제": {"score": 7.0, "evidence": ["Regulatory pathway discussed"], "confidence": 0.85},
-            "stage_3_플랫폼확장": {"score": 6.5, "evidence": ["Scalability potential identified"], "confidence": 0.80},
-            "stage_4_반복매출": {"score": 7.0, "evidence": ["Revenue model documented"], "confidence": 0.85},
-            "stage_5_RWW개입": {"score": 6.5, "evidence": ["Team capability assessed"], "confidence": 0.80},
-            "risks": [{"risk_type": "general", "description": "Standard VC risks", "severity": "medium"}],
-            "investment_thesis": text[:500]
-        }
+        """Parse Claude's text response. Raise on failure - no fallback."""
+        import re
+        json_match = re.search(r'```json\s*(.*?)\s*```', text, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group(1))
+        text = text.strip()
+        if text.startswith('{'):
+            return json.loads(text)
+        raise ValueError(f"Claude 응답에서 JSON 추출 실패:\n{text[:500]}")
 
     def _extract_scores_from_claude(self, claude_analysis: Dict[str, Any]) -> Dict[str, Any]:
         """Extract and structure 5-stage scores."""
