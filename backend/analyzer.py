@@ -131,7 +131,12 @@ class Analyzer:
     "platform_evolution": "<핵심 기술의 플랫폼 확장 가능성>",
     "regulatory_pathway": "<FDA De Novo/510k/PMA/CE 등 구체 경로>",
     "recurring_revenue": "<소모품/구독 구조 설계 유무와 근거>",
-    "ipo_factors": ["<2017→IPO 역산 팩터 1>", "<팩터 2>", "<팩터 3>"]
+    "ipo_factors": ["<2017→IPO 역산 팩터 1>", "<팩터 2>", "<팩터 3>"],
+    "ipo_reverse_analysis": [
+      {{"ir_expression_2017": "<IR 원문 표현 예: 'One Device, Different Disposables'>", "reverse_interpretation": "<역산 재해석 예: Razor-blade 비즈니스 모델 선언>", "ipo_linkage": "<IPO 가치 연결 예: 반복매출 구조 내재화>"}},
+      {{"ir_expression_2017": "<IR 원문 표현 2>", "reverse_interpretation": "<재해석 2>", "ipo_linkage": "<IPO 연결 2>"}},
+      {{"ir_expression_2017": "<IR 원문 표현 3>", "reverse_interpretation": "<재해석 3>", "ipo_linkage": "<IPO 연결 3>"}}
+    ]
   }},
 
   "early_indicators": [
@@ -152,10 +157,11 @@ class Analyzer:
   ],
 
   "risks": [
-    {{"risk_type": "regulatory", "description": "<규제 적응증 범위 제한 구체 기술>", "severity": "high|medium|low"}},
-    {{"risk_type": "clinical", "description": "<임상 데이터 한계 구체 기술>", "severity": "high|medium|low"}},
-    {{"risk_type": "valuation", "description": "<선반영된 낙관적 가정>", "severity": "high|medium|low"}}
+    {{"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정 여부와 적응증 범위 제한 (예: 특정 시술로만 승인) 구체 기술. IR에서 언급된 제품명/적응증 인용 필수", "severity": "high|medium|low"}},
+    {{"risk_type": "clinical", "description": "non-inferiority 설계 가능성, 단일 기관 편향, 샘플 수 한계 등 임상 데이터의 구체적 한계", "severity": "high|medium|low"}},
+    {{"risk_type": "valuation", "description": "IPO 목표가 선반영 여부, 특정 연도 매출 목표 (예: 2024E 150억) 달성 불확실성 등 밸류에이션 리스크 구체 기술", "severity": "high|medium|low"}}
   ],
+  "// risks 규칙": "위 3종(regulatory, clinical, valuation)은 반드시 모두 포함하라. IR에서 직접 근거를 찾을 수 없으면 '근거 부재'라고 명시하라.",
 
   "missing_information": [
     {{"category": "<카테고리>", "criticality": "critical|important|nice_to_have", "impact": "<왜 중요한가>"}}

@@ -21,7 +21,11 @@ MOCK_CLAUDE_JSON = {
         "platform_evolution": "HIFU 플랫폼은 정맥에서 종양/심혈관 확장 가능",
         "regulatory_pathway": "FDA De Novo (Class II reclassification) 확정",
         "recurring_revenue": "소모품 20%, 유지보수 계약 설계됨",
-        "ipo_factors": ["2017 De Novo 준비 착수", "2020 임상 500 케이스 돌파", "2023 소모품 매출 비중 20% 달성"]
+        "ipo_factors": ["2017 De Novo 준비 착수", "2020 임상 500 케이스 돌파", "2023 소모품 매출 비중 20% 달성"],
+        "ipo_reverse_analysis": [
+            {"ir_expression_2017": "One Device, Different Disposables", "reverse_interpretation": "Razor-blade 비즈니스 모델 선언", "ipo_linkage": "반복매출 구조 내재화"},
+            {"ir_expression_2017": "FDA De Novo 경로 준비", "reverse_interpretation": "Class II 신규 분류 선점 전략", "ipo_linkage": "독점 경로 확보"}
+        ]
     },
     "early_indicators": [
         {"indicator_name": "원천기술 물리적 제어 가능성", "description": "HIFU 주파수/출력 실시간 제어 특허 3건 보유, 경쟁사 대비 제어 정밀도 2배"},
@@ -38,9 +42,9 @@ MOCK_CLAUDE_JSON = {
         {"company": "PROCEPT BioRobotics (PRCT)", "similarity": "FDA De Novo 경로 활용", "outcome": "IPO 2021, $100M+ 매출", "relevance_to_subject": "De Novo 경로 IPO 가속 사례"}
     ],
     "risks": [
-        {"risk_type": "regulatory", "description": "FDA 승인 적응증이 정맥으로 한정될 위험", "severity": "high"},
-        {"risk_type": "clinical", "description": "non-inferiority 실패 시 급속 가치 하락", "severity": "medium"},
-        {"risk_type": "valuation", "description": "IPO 밸류에이션에 성공 시나리오가 선반영", "severity": "medium"}
+        {"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정, 적응증 범위 제한 (OcuCool → IVT만 승인)", "severity": "high"},
+        {"risk_type": "clinical", "description": "non-inferiority 설계 가능성, 단일 기관 편향 여부", "severity": "medium"},
+        {"risk_type": "valuation", "description": "IPO 목표가 선반영 여부, 2024E 150억 달성 불확실성", "severity": "medium"}
     ],
     "missing_information": [
         {"category": "financial_projections", "criticality": "important", "impact": "매출 전망치 없음"}
@@ -119,21 +123,39 @@ def run_mock():
     print(f"investment_case: {es.get('investment_case')[:120]}...")
     print(f"recommendation: {es.get('recommendation')}")
 
+    print("\n--- [4] Risks 섹션 3종 확인 ---")
+    md = result.get("markdown", "")
+    risk_checks = {
+        "규제 리스크": "규제 리스크" in md and ("FDA De Novo" in md or "OcuCool" in md),
+        "임상 한계": "임상 한계" in md and "non-inferiority" in md,
+        "밸류에이션 리스크": "밸류에이션 리스크" in md and ("IPO 목표가" in md or "150억" in md),
+    }
+    for k, v in risk_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [5] Factor Discovery 역산 테이블 확인 ---")
+    fd_checks = {
+        "역산 테이블 헤더": "IR 원문 표현" in md and "역산 재해석" in md and "IPO 가치 연결" in md,
+        "Razor-blade 재해석": "Razor-blade" in md,
+    }
+    for k, v in fd_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n" + "=" * 70)
     forbidden = ["Analyzed from IR materials", "Product Market Fit", "Regulatory Pathway Clarity",
-                 "Revenue Growth Trajectory", "Team Expansion", "Intuitive Surgical (ISRG)"]
-    md = result.get("markdown", "")
+                 "Revenue Growth Trajectory", "Team Expansion"]
     full_text = json.dumps(report_final, ensure_ascii=False) + md
-    flagged = [f for f in forbidden if f in full_text]
-    # Intuitive Surgical is OK if it comes from mock Claude response (we put it in mock)
-    # So filter: only flag if it's the OLD hardcoded template wording
-    bad = [f for f in flagged if f in ("Analyzed from IR materials", "Product Market Fit",
-                                        "Regulatory Pathway Clarity", "Revenue Growth Trajectory",
-                                        "Team Expansion")]
+    bad = [f for f in forbidden if f in full_text]
+    all_risks_ok = all(risk_checks.values())
+    all_fd_ok = all(fd_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
+    elif not all_risks_ok:
+        print("FAIL: Risks 3종 중 일부 누락")
+    elif not all_fd_ok:
+        print("FAIL: Factor Discovery 역산 테이블 누락")
     else:
-        print("PASS: 하드코딩 템플릿 제거됨. Claude 데이터 정상 반영.")
+        print("PASS: 하드코딩 제거 + Risks 3종 + Factor Discovery 역산 테이블 모두 정상")
     print("=" * 70)
 
 

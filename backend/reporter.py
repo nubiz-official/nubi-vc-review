@@ -32,11 +32,13 @@ class Reporter:
             "report_id": str(uuid.uuid4()),
             "analysis_id": analysis_id,
             "generated_at": datetime.utcnow().isoformat(),
-            "report_version": "v2.0",
+            "report_version": "v3.0",
             "executive_summary": self._generate_executive_summary(company_name, phase1, phase2),
             "early_indicators": self._generate_early_indicators(phase1),
             "5stage_scorecard": self._generate_5stage_scorecard(company_name, phase1),
             "cross_validation": self._generate_cross_validation(company_name, phase1),
+            "risks": phase1.get("key_risks", []),
+            "factor_discovery": phase1.get("factor_discovery", {}),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -253,6 +255,8 @@ class Reporter:
         early_ind = report_final.get("early_indicators", [])
         scorecard = report_final.get("5stage_scorecard", {})
         cross_val = report_final.get("cross_validation", [])
+        risks = report_final.get("risks", [])
+        factor_discovery = report_final.get("factor_discovery", {})
         appendix = report_final.get("appendix", {})
 
         md = f"""# NuBI VC Review Report
@@ -329,8 +333,68 @@ class Reporter:
             for c in cross_val.get("comparable_companies", []):
                 md += f"- **{c.get('company', 'N/A')}**: {c.get('outcome', '')}\n"
 
-        md += f"""
+        # ─── Risks Section ───
+        md += "\n---\n\n## Risks (필수 3종)\n\n"
+        risk_label = {
+            "regulatory": "규제 리스크",
+            "clinical": "임상 한계",
+            "valuation": "밸류에이션 리스크"
+        }
+        by_type = {}
+        if isinstance(risks, list):
+            for r in risks:
+                if isinstance(r, dict):
+                    rtype = r.get("risk_type", "other")
+                    by_type.setdefault(rtype, []).append(r)
+        for rtype in ["regulatory", "clinical", "valuation"]:
+            label = risk_label.get(rtype, rtype)
+            items = by_type.get(rtype, [])
+            md += f"### {label}\n"
+            if items:
+                for r in items:
+                    sev = r.get("severity", "")
+                    desc = r.get("description", "")
+                    md += f"- **[{sev.upper()}]** {desc}\n"
+            else:
+                md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
+            md += "\n"
 
+        # ─── Factor Discovery (IPO 역산 분석) ───
+        md += "---\n\n## Factor Discovery (IPO 역산 분석)\n\n"
+        if isinstance(factor_discovery, dict) and factor_discovery:
+            pe = factor_discovery.get("platform_evolution")
+            if pe:
+                md += f"**플랫폼 진화 가능성:** {pe}\n\n"
+            rp = factor_discovery.get("regulatory_pathway")
+            if rp:
+                md += f"**규제 경로:** {rp}\n\n"
+            rr = factor_discovery.get("recurring_revenue")
+            if rr:
+                md += f"**반복매출 구조:** {rr}\n\n"
+
+            ipo_factors = factor_discovery.get("ipo_factors", [])
+            if ipo_factors:
+                md += "**IPO 역산 팩터:**\n"
+                for f in ipo_factors:
+                    md += f"- {f}\n"
+                md += "\n"
+
+            reverse = factor_discovery.get("ipo_reverse_analysis", [])
+            if reverse:
+                md += "### 2017 IR 표현 → 역산적 재해석\n\n"
+                md += "| IR 원문 표현 (2017) | 역산 재해석 | IPO 가치 연결 |\n"
+                md += "|---|---|---|\n"
+                for row in reverse:
+                    if isinstance(row, dict):
+                        ir = row.get("ir_expression_2017", "")
+                        ri = row.get("reverse_interpretation", "")
+                        link = row.get("ipo_linkage", "")
+                        md += f"| {ir} | {ri} | {link} |\n"
+                md += "\n"
+        else:
+            md += "(Factor Discovery 데이터 없음)\n\n"
+
+        md += f"""
 ---
 
 ## Appendix
