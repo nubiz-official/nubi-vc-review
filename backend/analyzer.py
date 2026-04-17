@@ -86,7 +86,10 @@ class Analyzer:
             },
             "factor_discovery": claude_analysis.get("factor_discovery", {}),
             "early_indicators": claude_analysis.get("early_indicators", []),
-            "cross_validation": claude_analysis.get("cross_validation", [])
+            "cross_validation": claude_analysis.get("cross_validation", []),
+            "momentum_entry_timeline": claude_analysis.get("momentum_entry_timeline", {}),
+            "rww_synergy_scenarios": claude_analysis.get("rww_synergy_scenarios", []),
+            "nubiz_laws": claude_analysis.get("nubiz_laws", [])
         }
 
         metadata.status_history.append({
@@ -140,9 +143,9 @@ class Analyzer:
   }},
 
   "early_indicators": [
-    {{"indicator_name": "원천기술 물리적 제어 가능성", "description": "<IR 근거 인용 구체 문장>"}},
-    {{"indicator_name": "규제 실행 조직 선배치", "description": "<IR 근거 인용 구체 문장>"}},
-    {{"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "description": "<IR 근거 인용 구체 문장>"}}
+    {{"indicator_name": "원천기술 물리적 제어 가능성", "ir_evidence": "<IR 원문에서 직접 인용 (학술논문/프로토타입/제어 파라미터)>", "why_signal": "<왜 이것이 IPO 시그널인가: 물리제어 = 규제 재현성 확보>", "evaluation_formula": "<예: 원천기술 제어력 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수>"}},
+    {{"indicator_name": "규제 실행 조직 선배치", "ir_evidence": "<IR 원문 인용: RA/QC 전문가 경력, 합류 시점>", "why_signal": "<왜 시그널인가: 규제는 R&D와 병렬 실행될 때만 IPO 타이밍 확보>", "evaluation_formula": "<예: 규제 지능 점수 = (RA 합류 시점 ÷ 창업 후 경과월) × 규제 경로 난이도>"}},
+    {{"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "ir_evidence": "<IR 원문 인용: 기기-소모품 분리 설계, 카트리지 구조 등>", "why_signal": "<왜 시그널인가: 모듈화 = 반복매출 + 빠른 인증 확장>", "evaluation_formula": "<예: 모듈화 점수 = (소모품 SKU 수 × 적용 임상 영역 수) / 기기 플랫폼 수>"}}
   ],
 
   "stage_1_원천기술통제": {{"score": <0-10 숫자>, "evidence": ["<근거 문장 1>", "<근거 문장 2>"], "confidence": <0-1>}},
@@ -166,7 +169,41 @@ class Analyzer:
 
   "missing_information": [
     {{"category": "<카테고리>", "criticality": "critical|important|nice_to_have", "impact": "<왜 중요한가>"}}
-  ]
+  ],
+
+  "momentum_entry_timeline": {{
+    "regulatory": [
+      {{"year": "<연도 또는 IR 시점>", "event": "<이벤트 예: FDA 1차 대면미팅 → De Novo 적절 판정>", "strategic_meaning": "<전략적 의미 예: 510(k) 불가 → De Novo 필수 확인 — 규제 경로 확정>"}}
+    ],
+    "recurring_revenue": [
+      {{"year": "<연도>", "event": "<이벤트 예: 소모품 카트리지 설계 확정 / 총판 재구매 발생>", "numeric_evidence": "<수치 예: 소모품 매출 비중 80%+ 확인 / MOQ 40억 실주문 58억>"}}
+    ],
+    "global_channel": [
+      {{"year": "<연도>", "event": "<이벤트 예: KOTRA G4A 선정 / 20개국 인증 / 5개국 독점 총판>", "coverage": "<국가/파트너 예: 미국 FDA + 유럽 CE + 20개국 + LG화학 중국 독점>"}}
+    ],
+    "entry_judgment": {{
+      "regulatory_entry_point": "<규제 경로가 핵심 동력으로 편입된 시점과 근거>",
+      "recurring_revenue_entry_point": "<반복매출이 실증된 시점과 근거>",
+      "global_channel_entry_point": "<글로벌 채널이 확보된 시점과 근거>"
+    }}
+  }},
+  "// momentum_entry_timeline 규칙": "각 배열은 최소 2개 이상의 시점 이벤트를 포함하라. IR에서 연도/시점 근거를 찾을 수 없으면 'IR 미기재'라고 명시하라.",
+
+  "rww_synergy_scenarios": [
+    {{"intervention_area": "규제 문서 자동화", "expected_effect": "<회사 맥락에 맞는 기대 효과 예: FDA/CE 문서 생성 시간 60% 단축>", "value_increment_basis": "<가치 증분 근거 예: 인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생>"}},
+    {{"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>"}},
+    {{"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<영업이익률 개선 근거>"}},
+    {{"intervention_area": "IR 데이터 자동 생성", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<투자자 커뮤니케이션/자금조달 비용 절감 근거>"}},
+    {{"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<IP 가치 보전/방어 근거>"}}
+  ],
+  "// rww_synergy_scenarios 규칙": "5개 영역 모두 포함하라. 회사가 해당 영역과 무관하면 '해당 없음'이라고 명시하되, 가능한 경우 회사의 실제 제품/파이프라인에 맞춰 구체화하라.",
+
+  "nubiz_laws": [
+    {{"law": "<한 문장 법칙 예: '기술이 아니라 제어력이 상장한다'>", "evidence_for_company": "<회사에 적용된 증거 예: 경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, FDA 재현성 요건 충족>"}},
+    {{"law": "<두 번째 법칙 예: '규제는 비용이 아니라 자산이다'>", "evidence_for_company": "<회사 증거 예: FDA De Novo 준비 6년, 1000+ 케이스 → 후발주자 진입 장벽>"}},
+    {{"law": "<세 번째 법칙 예: '소모품이 없으면 상장도 없다'>", "evidence_for_company": "<회사 증거 예: 소모품 매출 80%+, CAGR 109%, 영업이익률 51%+>"}}
+  ],
+  "// nubiz_laws 규칙": "정확히 3개 법칙을 도출하라. 법칙은 이 회사의 사례에서 일반화 가능한 투자 명제여야 한다. 법칙 문장은 짧고 대비적(A가 아니라 B다 형식 권장)이어야 한다."
 }}
 ```
 

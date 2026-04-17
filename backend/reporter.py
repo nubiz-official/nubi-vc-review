@@ -39,6 +39,9 @@ class Reporter:
             "cross_validation": self._generate_cross_validation(company_name, phase1),
             "risks": phase1.get("key_risks", []),
             "factor_discovery": phase1.get("factor_discovery", {}),
+            "momentum_entry_timeline": phase1.get("momentum_entry_timeline", {}),
+            "rww_synergy_scenarios": phase1.get("rww_synergy_scenarios", []),
+            "nubiz_laws": phase1.get("nubiz_laws", []),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -248,6 +251,9 @@ class Reporter:
         cross_val = report_final.get("cross_validation", [])
         risks = report_final.get("risks", [])
         factor_discovery = report_final.get("factor_discovery", {})
+        momentum = report_final.get("momentum_entry_timeline", {})
+        rww_scenarios = report_final.get("rww_synergy_scenarios", [])
+        laws = report_final.get("nubiz_laws", [])
         appendix = report_final.get("appendix", {})
 
         md = f"""# NuBI VC Review Report
@@ -278,8 +284,17 @@ class Reporter:
             for ind in early_ind:
                 if isinstance(ind, dict):
                     name = ind.get("indicator_name") or ind.get("name") or ind.get("indicator") or ""
-                    desc = ind.get("description") or ind.get("current_status") or ind.get("status") or ""
-                    md += f"- **{name}**: {desc}\n"
+                    ir_ev = ind.get("ir_evidence") or ind.get("description") or ind.get("current_status") or ""
+                    why = ind.get("why_signal", "")
+                    formula = ind.get("evaluation_formula", "")
+                    md += f"### {name}\n"
+                    if ir_ev:
+                        md += f"- **2017 IR 근거:** {ir_ev}\n"
+                    if why:
+                        md += f"- **왜 시그널인가:** {why}\n"
+                    if formula:
+                        md += f"- **평가 공식:** `{formula}`\n"
+                    md += "\n"
                 else:
                     md += f"- {ind}\n"
         elif isinstance(early_ind, dict):
@@ -350,6 +365,38 @@ class Reporter:
                 md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
             md += "\n"
 
+        # ─── 동력 편입 시점 (Momentum Entry Timeline) ───
+        md += "---\n\n## 핵심 동력 편입 시점\n\n"
+        if isinstance(momentum, dict) and momentum:
+            driver_labels = [
+                ("regulatory", "규제 경로 (FDA De Novo / 510k / PMA / CE)", ["year", "event", "strategic_meaning"], ["시점", "이벤트", "전략적 의미"]),
+                ("recurring_revenue", "반복매출 (Razor-Blade / 소모품 / 구독)", ["year", "event", "numeric_evidence"], ["시점", "이벤트", "수치 근거"]),
+                ("global_channel", "글로벌 다중 인증 채널", ["year", "event", "coverage"], ["시점", "이벤트", "커버리지"]),
+            ]
+            for key, label, fields, headers in driver_labels:
+                rows = momentum.get(key, [])
+                md += f"### {label}\n\n"
+                if rows:
+                    md += f"| {' | '.join(headers)} |\n"
+                    md += "|" + "|".join(["---"] * len(headers)) + "|\n"
+                    for r in rows:
+                        if isinstance(r, dict):
+                            md += "| " + " | ".join(str(r.get(f, "")) for f in fields) + " |\n"
+                    md += "\n"
+                else:
+                    md += "(데이터 부족)\n\n"
+
+            judgment = momentum.get("entry_judgment", {})
+            if isinstance(judgment, dict) and judgment:
+                md += "### 편입 시점 판정\n\n"
+                for k, label in [("regulatory_entry_point", "규제 경로"), ("recurring_revenue_entry_point", "반복매출"), ("global_channel_entry_point", "글로벌 채널")]:
+                    v = judgment.get(k)
+                    if v:
+                        md += f"- **{label}:** {v}\n"
+                md += "\n"
+        else:
+            md += "(동력 편입 시점 데이터 없음)\n\n"
+
         # ─── Factor Discovery (IPO 역산 분석) ───
         md += "---\n\n## Factor Discovery (IPO 역산 분석)\n\n"
         if isinstance(factor_discovery, dict) and factor_discovery:
@@ -384,6 +431,33 @@ class Reporter:
                 md += "\n"
         else:
             md += "(Factor Discovery 데이터 없음)\n\n"
+
+        # ─── RWW 퀀텀 점프 시나리오 ───
+        md += "\n---\n\n## NuBIZ RWW 플랫폼 적용 시 기업가치 퀀텀 점프 시나리오\n\n"
+        if isinstance(rww_scenarios, list) and rww_scenarios:
+            md += "| RWW 개입 영역 | 기대 효과 | 가치 증분 근거 |\n|---|---|---|\n"
+            for s in rww_scenarios:
+                if isinstance(s, dict):
+                    area = s.get("intervention_area", "")
+                    eff = s.get("expected_effect", "")
+                    val = s.get("value_increment_basis", "")
+                    md += f"| {area} | {eff} | {val} |\n"
+            md += "\n"
+        else:
+            md += "(RWW 시너지 시나리오 데이터 없음)\n\n"
+
+        # ─── 3대 법칙 (Final Take) ───
+        md += "---\n\n## Final Take — 누비즈 3대 법칙\n\n"
+        if isinstance(laws, list) and laws:
+            for i, l in enumerate(laws, 1):
+                if isinstance(l, dict):
+                    law = l.get("law", "")
+                    ev = l.get("evidence_for_company", "")
+                    md += f"**법칙 {i}: {law}**\n\n"
+                    if ev:
+                        md += f"> {ev}\n\n"
+        else:
+            md += "(3대 법칙 데이터 없음)\n\n"
 
         md += f"""
 ---

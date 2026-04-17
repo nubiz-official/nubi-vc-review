@@ -28,9 +28,43 @@ MOCK_CLAUDE_JSON = {
         ]
     },
     "early_indicators": [
-        {"indicator_name": "원천기술 물리적 제어 가능성", "description": "HIFU 주파수/출력 실시간 제어 특허 3건 보유, 경쟁사 대비 제어 정밀도 2배"},
-        {"indicator_name": "규제 실행 조직 선배치", "description": "2017년 창업 시점 FDA Regulatory Affairs VP 영입, 6년간 De Novo 준비 전담"},
-        {"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "description": "본체-프로브-소모품 3단 분리 구조, 소모품은 1회용 설계로 반복 매출 확보"}
+        {"indicator_name": "원천기술 물리적 제어 가능성", "ir_evidence": "CEO 김건호 Nature Materials 2013/2015 논문, 초당 50회 피드백 제어", "why_signal": "물리 제어는 FDA 재현성 요건을 구조적으로 충족", "evaluation_formula": "원천기술 제어력 = (물리 파라미터 수 / 총 변수 수) × 재현성 계수"},
+        {"indicator_name": "규제 실행 조직 선배치", "ir_evidence": "RA 경력 20년 백종환 COO, 100개 제품 인허가 경력", "why_signal": "규제를 R&D와 병렬 실행할 때만 IPO 타이밍 확보", "evaluation_formula": "규제 지능 점수 = (RA 합류 시점 ÷ 창업 후 경과월) × 규제 경로 난이도"},
+        {"indicator_name": "제품 아키텍처 모듈화/소모품 설계", "ir_evidence": "'One Device, Different Disposables' — 카트리지 분리 설계", "why_signal": "모듈화는 반복매출 + 빠른 규제 확장의 동시 조건", "evaluation_formula": "모듈화 점수 = (소모품 SKU 수 × 임상 영역 수) / 기기 플랫폼 수"}
+    ],
+    "momentum_entry_timeline": {
+        "regulatory": [
+            {"year": "2018", "event": "FDA 1차 대면미팅 → De Novo 적절 판정", "strategic_meaning": "510(k) 불가 확인 → De Novo 경로 확정 전환점"},
+            {"year": "2023.03", "event": "De Novo 제출", "strategic_meaning": "한국 최초 FDA De Novo 신청"},
+            {"year": "2024.10", "event": "FDA De Novo 승인", "strategic_meaning": "IPO 기술특례상장 핵심 트리거"}
+        ],
+        "recurring_revenue": [
+            {"year": "2019", "event": "TargetCool 소형 카트리지 180g 설계 확정", "numeric_evidence": "대형 탱크(40kg) 대신 소형 카트리지 설계 결정"},
+            {"year": "2022 Q4", "event": "유럽/동남아/중동 재구매 발생", "numeric_evidence": "소모품 매출 비중 80%+ 확인"},
+            {"year": "2023", "event": "MOQ 40억 달성 / 실주문 58억", "numeric_evidence": "2023 매출 50억+, 영업이익률 51%+ 전환"}
+        ],
+        "global_channel": [
+            {"year": "2017", "event": "Bayer-KOTRA G4A 선정", "coverage": "글로벌 제약사 네트워크 진입"},
+            {"year": "2021", "event": "국내 식약처 + 유럽 MDAC + 미국 FDA 인증", "coverage": "주요 3대 시장 규제 확보"},
+            {"year": "2023-24", "event": "LG화학(중국), IDS(동남아), IMDAD(중동) 독점 총판", "coverage": "20개국 인증 + 5대 독점 총판"}
+        ],
+        "entry_judgment": {
+            "regulatory_entry_point": "2018년. 창업 2년차에 FDA 직접 접촉하여 De Novo 경로 확보. 이후 6년간 규제가 IPO 핵심 자산으로 전환.",
+            "recurring_revenue_entry_point": "2022 Q4. 하드웨어 설계는 2019년 확정되었으나 실제 반복매출 검증은 해외 총판 재구매 시점.",
+            "global_channel_entry_point": "2021. 3대 규제 동시 확보로 글로벌 독점 총판 확장 가능성 현실화."
+        }
+    },
+    "rww_synergy_scenarios": [
+        {"intervention_area": "규제 문서 자동화", "expected_effect": "FDA/CE/KGMP 문서 생성 시간 60% 단축", "value_increment_basis": "인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생"},
+        {"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "20개국 인증을 체계적으로 추적/관리", "value_increment_basis": "시장 진입 속도 × 매출 = 밸류에이션 프리미엄"},
+        {"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "총판별 재구매 패턴 분석 → 재고/생산 최적화", "value_increment_basis": "영업이익률 추가 5~10%p 개선 가능"},
+        {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감"},
+        {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "IP 가치 보전 및 방어적 라이센싱 수익"}
+    ],
+    "nubiz_laws": [
+        {"law": "기술이 아니라 제어력이 상장한다", "evidence_for_company": "경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, -50℃~+5℃ 범위 제어가 FDA 재현성 요건을 충족"},
+        {"law": "규제는 비용이 아니라 자산이다", "evidence_for_company": "FDA De Novo 준비 6년, 임상 1000+ 케이스가 후발주자 진입 장벽으로 전환 — IPO 시 기업가치 3,000억 핵심 드라이버"},
+        {"law": "소모품이 없으면 상장도 없다", "evidence_for_company": "경쟁사 대형탱크(40kg) vs 소형카트리지(180g) 설계 차이 → 소모품 매출 80%+, CAGR 109%, 영업이익률 51%+ 달성"}
     ],
     "stage_1_원천기술통제": {"score": 9.0, "evidence": ["HIFU 제어 특허 3건", "IP 포트폴리오 15건"], "confidence": 0.9},
     "stage_2_규제통제": {"score": 9.5, "evidence": ["FDA De Novo 경로 확정", "임상 1000+ 케이스 확보"], "confidence": 0.95},
@@ -157,6 +191,49 @@ def run_mock():
     for k, v in obsolete_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    # ─── Wave 1 gate ───
+    print("\n--- [W1-A] 동력 편입 시점 타임라인 확인 ---")
+    wave1a_checks = {
+        "섹션 헤더": "핵심 동력 편입 시점" in md,
+        "규제 경로 표": "FDA 1차 대면미팅" in md and "2018" in md,
+        "반복매출 표": "소모품 매출 비중 80" in md,
+        "글로벌 채널 표": "LG화학" in md or "20개국" in md,
+        "편입 시점 판정": "편입 시점 판정" in md,
+    }
+    for k, v in wave1a_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-B] Early Indicators why_signal + 평가 공식 확인 ---")
+    wave1b_checks = {
+        "왜 시그널인가": "왜 시그널인가" in md,
+        "평가 공식": "평가 공식" in md,
+        "공식 예시 포함": "재현성 계수" in md or "RA 합류 시점" in md,
+    }
+    for k, v in wave1b_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-C] RWW 퀀텀 점프 시나리오 확인 ---")
+    wave1c_checks = {
+        "섹션 헤더": "RWW 플랫폼 적용 시 기업가치 퀀텀 점프 시나리오" in md,
+        "규제 문서 자동화": "규제 문서 자동화" in md,
+        "다국가 인허가 병렬 관리": "다국가 인허가 병렬 관리" in md,
+        "재구매 예측": "재구매" in md,
+        "IR 자동 생성": "IR 데이터 자동 생성" in md,
+        "IP 관리": "IP 포트폴리오 관리" in md,
+    }
+    for k, v in wave1c_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-D] 3대 법칙 (Final Take) 확인 ---")
+    wave1d_checks = {
+        "섹션 헤더": "Final Take" in md and "3대 법칙" in md,
+        "법칙 1 (제어력)": "제어력이 상장한다" in md,
+        "법칙 2 (규제 자산)": "규제는 비용이 아니라 자산이다" in md,
+        "법칙 3 (소모품)": "소모품이 없으면 상장도 없다" in md,
+    }
+    for k, v in wave1d_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n" + "=" * 70)
     forbidden = ["Analyzed from IR materials", "Product Market Fit", "Regulatory Pathway Clarity",
                  "Revenue Growth Trajectory", "Team Expansion"]
@@ -166,6 +243,10 @@ def run_mock():
     all_fd_ok = all(fd_checks.values())
     all_overseas_ok = all(overseas_checks.values())
     all_obsolete_ok = all(obsolete_checks.values())
+    all_w1a = all(wave1a_checks.values())
+    all_w1b = all(wave1b_checks.values())
+    all_w1c = all(wave1c_checks.values())
+    all_w1d = all(wave1d_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -176,8 +257,16 @@ def run_mock():
         print("FAIL: stage_5 해외 매출 비중 누락")
     elif not all_obsolete_ok:
         print("FAIL: Appendix obsolete 문구 잔존")
+    elif not all_w1a:
+        print("FAIL: Wave 1-A (동력 편입 시점) 누락")
+    elif not all_w1b:
+        print("FAIL: Wave 1-B (why_signal/평가공식) 누락")
+    elif not all_w1c:
+        print("FAIL: Wave 1-C (RWW 시나리오) 누락")
+    elif not all_w1d:
+        print("FAIL: Wave 1-D (3대 법칙) 누락")
     else:
-        print("PASS: 모든 항목 정상 (하드코딩/Risks/FactorDiscovery/해외매출/Appendix)")
+        print("PASS: 모든 항목 + Wave 1 4개 섹션 모두 정상")
     print("=" * 70)
 
 
