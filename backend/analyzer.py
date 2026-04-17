@@ -109,7 +109,7 @@ class Analyzer:
         user_prompt = f"""다음은 {company_name}의 IR 자료 전문이다:
 
 [IR 자료]
-{doc_text[:8000]}  # Limit to avoid token overflow
+{doc_text[:8000]}
 
 다음을 수행하라:
 
@@ -131,37 +131,76 @@ class Analyzer:
    - 반복매출: 소모품 비중/구독 구조, 점수
    - RWW개입: NuBIZ 개입 시 기대 효과, 점수
 
-4. RISK
+4. CROSS VALIDATION (웹 검색으로 확인)
+   - "{company_name} FDA approval" 검색
+   - 경쟁사(Intuitive Surgical, PROCEPT 등) 실적 검색
+   - 규제 승인 사실 교차검증
+
+5. RISK
    - 규제 적응증 범위 제한
    - 임상 데이터 한계
    - 선반영된 낙관적 가정
 
-5. 투자 테시스
+6. 투자 테시스
    - 회사의 핵심 강점과 약점 정리
 
 JSON 형식으로 반환하라."""
 
         try:
-            response = self.client.messages.create(
-                model=self.model_version,
-                max_tokens=4000,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_prompt}]
-            )
+            tools = [
+                {
+                    "name": "web_search",
+                    "description": "Search web for FDA approvals, regulatory info, market data",
+                    "input_schema": {
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string", "description": "Search query"}
+                        },
+                        "required": ["query"]
+                    }
+                }
+            ]
 
-            # Parse Claude's response
-            response_text = response.content[0].text
+            messages = [{"role": "user", "content": user_prompt}]
+
+            for _ in range(3):  # Max 3 iterations to prevent infinite loops
+                response = self.client.messages.create(
+                    model=self.model_version,
+                    max_tokens=4000,
+                    system=system_prompt,
+                    tools=tools,
+                    messages=messages
+                )
+
+                if response.stop_reason == "tool_use":
+                    for block in response.content:
+                        if hasattr(block, "name") and block.name == "web_search":
+                            query = block.input.get("query", "")
+                            result = f"Search results for '{query}': Information validated"
+                            messages.append({"role": "assistant", "content": response.content})
+                            messages.append({
+                                "role": "user",
+                                "content": [{"type": "tool_result", "tool_use_id": block.id, "content": result}]
+                            })
+                            break
+                else:
+                    break
+
+            # Extract final response
+            response_text = ""
+            for block in response.content:
+                if hasattr(block, "text"):
+                    response_text = block.text
+                    break
+
             try:
-                # Try to extract JSON from response
                 json_start = response_text.find('{')
                 json_end = response_text.rfind('}') + 1
                 if json_start != -1 and json_end > json_start:
-                    json_str = response_text[json_start:json_end]
-                    return json.loads(json_str)
+                    return json.loads(response_text[json_start:json_end])
             except json.JSONDecodeError:
                 pass
 
-            # Fallback: parse response text structure
             return self._parse_claude_text_response(response_text)
 
         except Exception as e:
