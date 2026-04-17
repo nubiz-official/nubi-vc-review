@@ -215,11 +215,11 @@ JSON 형식으로 반환하라."""
         return {
             "factor_discovery": {"analysis": text[:1000]},
             "early_indicators": ["Preliminary analysis based on IR materials"],
-            "stage_1_원천기술통제": {"score": 7.0, "evidence": "Analyzed from IR materials", "confidence": 0.85},
-            "stage_2_규제통제": {"score": 7.0, "evidence": "Regulatory pathway discussed", "confidence": 0.85},
-            "stage_3_플랫폼확장": {"score": 6.5, "evidence": "Scalability potential identified", "confidence": 0.80},
-            "stage_4_반복매출": {"score": 7.0, "evidence": "Revenue model documented", "confidence": 0.85},
-            "stage_5_RWW개입": {"score": 6.5, "evidence": "Team capability assessed", "confidence": 0.80},
+            "stage_1_원천기술통제": {"score": 7.0, "evidence": ["Analyzed from IR materials"], "confidence": 0.85},
+            "stage_2_규제통제": {"score": 7.0, "evidence": ["Regulatory pathway discussed"], "confidence": 0.85},
+            "stage_3_플랫폼확장": {"score": 6.5, "evidence": ["Scalability potential identified"], "confidence": 0.80},
+            "stage_4_반복매출": {"score": 7.0, "evidence": ["Revenue model documented"], "confidence": 0.85},
+            "stage_5_RWW개입": {"score": 6.5, "evidence": ["Team capability assessed"], "confidence": 0.80},
             "risks": [{"risk_type": "general", "description": "Standard VC risks", "severity": "medium"}],
             "investment_thesis": text[:500]
         }
@@ -232,13 +232,21 @@ JSON 형식으로 반환하라."""
                 stage_data = claude_analysis[stage_key]
                 if isinstance(stage_data, dict):
                     score = float(stage_data.get("score", 6.5))
+                    evidence = stage_data.get("evidence", [])
+                    if isinstance(evidence, str):
+                        evidence = [evidence]
+                    counterevidence = stage_data.get("counterevidence", [])
+                    if isinstance(counterevidence, str):
+                        counterevidence = [counterevidence]
                 else:
                     score = 6.5
+                    evidence = []
+                    counterevidence = []
                 scores[stage_key] = {
                     "score": min(score, 10.0),
                     "rubric_level": "strong" if score >= 8.0 else "adequate" if score >= 6.5 else "concerning",
-                    "evidence": stage_data.get("evidence", []) if isinstance(stage_data, dict) else [],
-                    "counterevidence": stage_data.get("counterevidence", []) if isinstance(stage_data, dict) else [],
+                    "evidence": evidence,
+                    "counterevidence": counterevidence,
                     "confidence": stage_data.get("confidence", 0.85) if isinstance(stage_data, dict) else 0.85
                 }
 
