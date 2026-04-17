@@ -4,6 +4,9 @@ NuBI VC Review — 투자 타당성 검토 플랫폼 (Railway 배포용)
 
 Pipeline: Input → Analyzer (Phase 1) → Validator (Phase 2) → Reporter → Display
 """
+# TEST: Force error to confirm app.py is being loaded
+raise RuntimeError(">>> INIT TEST: app.py is loading (this error confirms execution)")
+
 import sys
 import os
 
