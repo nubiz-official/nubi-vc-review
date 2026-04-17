@@ -7,28 +7,18 @@ Pipeline: Input → Analyzer (Phase 1) → Validator (Phase 2) → Reporter → 
 import sys
 import os
 
-# Early stderr logging (before streamlit import)
-sys.stderr.write(">>> INIT 1: sys imported\n")
-sys.stderr.flush()
-
 import streamlit as st
-sys.stderr.write(">>> INIT 2: streamlit imported\n")
-sys.stderr.flush()
 
 # Set page config FIRST
-try:
-    st.set_page_config(
-        page_title="NuBI VC Review",
-        page_icon="📊",
-        layout="centered",
-        initial_sidebar_state="collapsed",
-    )
-    sys.stderr.write(">>> INIT 3: page config set\n")
-    sys.stderr.flush()
-except Exception as e:
-    sys.stderr.write(f">>> ERROR at set_page_config: {e}\n")
-    sys.stderr.flush()
-    raise
+st.set_page_config(
+    page_title="NuBI VC Review",
+    page_icon="📊",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
+# Show init status in UI
+st.write("🚀 Initializing NuBI VC Review...")
 
 import pdfplumber
 import io
@@ -37,28 +27,21 @@ import pandas as pd
 from datetime import datetime
 from docx import Document
 import uuid
-sys.stderr.write(">>> INIT 4: standard libraries imported\n")
-sys.stderr.flush()
+
+st.write("✓ Standard libraries loaded")
 
 # Backend imports
 streamlit_dir = os.path.dirname(os.path.abspath(__file__))
 service_root = os.path.dirname(streamlit_dir)
-sys.stderr.write(f">>> INIT 5: streamlit_dir={streamlit_dir}, service_root={service_root}\n")
-sys.stderr.flush()
 
 if service_root not in sys.path:
     sys.path.insert(0, service_root)
-    sys.stderr.write(f">>> INIT 6: added {service_root} to sys.path\n")
-    sys.stderr.flush()
 
 try:
     from backend import Analyzer, Validator, Reporter, SchemaValidator
-    sys.stderr.write(">>> INIT 7: backend modules imported successfully\n")
-    sys.stderr.flush()
+    st.write("✓ Backend modules loaded")
 except ImportError as e:
-    sys.stderr.write(f">>> ERROR importing backend: {e}\n")
-    sys.stderr.flush()
-    st.error(f"Backend import failed: {e}")
+    st.error(f"❌ Backend import failed: {e}")
     import traceback
     st.write(traceback.format_exc())
     st.stop()
