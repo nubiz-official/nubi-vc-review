@@ -1,0 +1,58 @@
+{
+  "company": {
+    "name": "Recens Medical",
+    "industry": "medtech",
+    "stage": "seriesA",
+    "founded_year": 2017,
+    "hq_country": "KR",
+    "description": "Renal diagnostics platform enabling early detection of kidney disease progression through innovative biomarker testing"
+  },
+  "analysis_request": {
+    "purpose": "ipo_factor_analysis",
+    "priority": "high",
+    "context": "Series A fundraising round evaluation for institutional investors",
+    "vc_opinion": "Recens Medical demonstrates exceptional regulatory clarity for a medtech company at Series A stage. The FDA pathway for their companion diagnostic is well-defined, with a clear reimbursement path through CPT codes. The repeat revenue model from disposable testing supplies is particularly attractive. Team has prior regulatory experience from exits. My main concern is market validation - they have pilot data but limited commercial traction. Still, this is a high-conviction investment in the regulatory-heavy diagnostic space.",
+    "vc_firm": "Leading Healthcare VC",
+    "previous_analysis_id": null
+  },
+  "documents": [
+    {
+      "file_id": "doc_1",
+      "filename": "recens_series_a_deck.pdf",
+      "filetype": "pdf",
+      "size_bytes": 5243456,
+      "base64_content": "JVBERi0xLjQKJeLjz9MNCjEgMCBvYmo... (truncated for brevity)",
+      "doc_type": "pitch_deck",
+      "confidence": 0.95
+    },
+    {
+      "file_id": "doc_2",
+      "filename": "recens_regulatory_roadmap.pdf",
+      "filetype": "pdf",
+      "size_bytes": 2156784,
+      "base64_content": "JVBERi0xLjQKJeLjz9MNCjIgMCBvYmo... (truncated for brevity)",
+      "doc_type": "regulatory_filing",
+      "confidence": 0.92
+    },
+    {
+      "file_id": "doc_3",
+      "filename": "recens_market_research.docx",
+      "filetype": "docx",
+      "size_bytes": 892341,
+      "base64_content": "UEsDBBQACAAIAP...(truncated for brevity)",
+      "doc_type": "market_research",
+      "confidence": 0.85
+    }
+  ],
+  "quality_flags": {
+    "external_validation_done": true,
+    "missing_key_info": [
+      "Complete financial projections beyond 2 years",
+      "Detailed competitor technology comparison"
+    ],
+    "red_flags_already_identified": [
+      "Limited commercial customer base at Series A stage",
+      "Regulatory approval timeline extending 18+ months"
+    ]
+  }
+}

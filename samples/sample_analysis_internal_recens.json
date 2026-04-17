@@ -1,0 +1,294 @@
+{
+  "phase1_analysis": {
+    "timestamp_started": "2026-04-17T10:00:00Z",
+    "timestamp_completed": "2026-04-17T10:45:00Z",
+    "model_used": "claude-sonnet-4-20250514",
+    "prompt_version": "v1.0.0",
+    "scores": {
+      "market": {
+        "score": 8.0,
+        "rubric_level": "strong",
+        "evidence": [
+          "Chronic kidney disease affects 37 million Americans with $120B annual treatment market",
+          "Early detection enables lifestyle intervention and delays progression, creating high-value care opportunity",
+          "Companion diagnostic model drives recurring revenue from repeat testing (monthly/quarterly)"
+        ],
+        "counterevidence": [
+          "Market fragmented with existing competitors (DaVita, FreseniusMedical have diagnostics)",
+          "Reimbursement landscape in transition with variable CPT coverage by payer"
+        ],
+        "confidence": 0.85
+      },
+      "solution": {
+        "score": 8.0,
+        "rubric_level": "strong",
+        "evidence": [
+          "Proprietary biomarker panel (3-marker combination) shows 94% sensitivity/specificity vs 70% for single markers",
+          "FDA breakthrough device designation granted (2024), accelerates approval pathway",
+          "Disposable test format (similar to glucose monitoring) enables patient home use and recurring orders"
+        ],
+        "counterevidence": [
+          "Clinical validation dataset limited to 3,000 patients (larger studies ongoing)",
+          "Biomarker specificity degraded in certain patient subgroups (diabetic CKD)"
+        ],
+        "confidence": 0.82
+      },
+      "team": {
+        "score": 7.0,
+        "rubric_level": "strong",
+        "evidence": [
+          "CEO: 15 years in diagnostics, prior exit (Quidel acquisition 2018)",
+          "CTO: PharmD + PhD, published 12 peer-reviewed papers on biomarkers",
+          "Board includes former FDA reviewer (renal division) and hospital CMO"
+        ],
+        "counterevidence": [
+          "Only 2 team members have medtech commercialization experience",
+          "No CFO at time of Series A (advisory role)"
+        ],
+        "confidence": 0.78
+      },
+      "scalability": {
+        "score": 7.0,
+        "rubric_level": "strong",
+        "evidence": [
+          "CLIA-certified lab infrastructure scalable to 50K+ tests/month (currently running 5K/month)",
+          "Distribution partnerships in place with 3 major hospital networks (signed LOIs)",
+          "Software platform (patient dashboard, provider portal) built for multi-site rollout"
+        ],
+        "counterevidence": [
+          "Regulatory approval in only US market (no EU CE mark pathway clear yet)",
+          "Supply chain for specialty test components limited to single supplier"
+        ],
+        "confidence": 0.75
+      },
+      "overall": {
+        "score": 7.5,
+        "grade": "B",
+        "reasoning": "Strong regulatory clarity, solid market opportunity, and experienced team offset by early commercial validation stage and market concentration risks. Grade B reflects conditional investment thesis pending validation of customer acquisition and reimbursement execution."
+      }
+    },
+    "narrative_analysis": {
+      "market": "Recens Medical operates in the $120B renal diagnostics and management market. The opportunity centers on early CKD detection enabling proactive intervention. Market dynamics favor high-volume, recurring-revenue diagnostic solutions. Key risk: reimbursement landscape still evolving with variable payer coverage.",
+      "solution": "The proprietary 3-marker biomarker panel represents meaningful clinical improvement over current single-marker tests (94% vs 70% sensitivity/specificity). FDA breakthrough designation validates the clinical value proposition. Disposable format enables recurring patient testing. Validation dataset adequate but limited; larger studies ongoing.",
+      "team": "Leadership team demonstrates relevant experience in diagnostics commercialization with prior exit (Quidel). Regulatory expertise on board through former FDA reviewer. Gap: limited medtech go-to-market experience; CFO role in advisory capacity only.",
+      "scalability": "Infrastructure supports 10x growth in testing volume without major capital investment. Distribution partnerships with major hospital networks provide market access pathway. Software platform architecture designed for multi-site deployment. Risk: regulatory pathway outside US not defined; supply chain concentration on single component supplier."
+    },
+    "investment_thesis": "Recens Medical combines regulatory clarity (FDA breakthrough device designation), large market opportunity (early CKD detection in 37M patient population), and a repeat-revenue business model (monthly/quarterly testing) with an experienced team. Series A funding enables regulatory approval path completion and commercial validation in 2-3 hospital networks. Grade B investment reflects strong fundamentals with execution risk during early commercialization phase.",
+    "key_risks": [
+      {
+        "risk_type": "regulatory",
+        "description": "FDA approval timeline could extend beyond current 18-month projection; additional clinical data may be requested",
+        "severity": "high",
+        "mitigation_required": true
+      },
+      {
+        "risk_type": "market",
+        "description": "Hospital network adoption slower than projected; competition from established diagnostic vendors (DaVita, Fresenius) offering bundled solutions",
+        "severity": "high",
+        "mitigation_required": true
+      },
+      {
+        "risk_type": "financial",
+        "description": "Reimbursement rates for CPT codes may be lower than model assumptions; payer negotiation complexity",
+        "severity": "medium",
+        "mitigation_required": true
+      },
+      {
+        "risk_type": "operational",
+        "description": "Scaling CLIA lab operations while maintaining quality metrics (turnaround time, accuracy) during rapid growth",
+        "severity": "medium",
+        "mitigation_required": true
+      },
+      {
+        "risk_type": "team",
+        "description": "CFO role is advisory; need for experienced medtech commercialization operations lead",
+        "severity": "medium",
+        "mitigation_required": true
+      }
+    ],
+    "red_flags": [
+      {
+        "flag": "Limited commercial traction at Series A stage (5K tests/month vs 20K+ target in business plan)",
+        "severity": "high",
+        "evidence": "Early customers are pilot/research relationships; no enterprise contracts signed",
+        "verification_needed": true
+      },
+      {
+        "flag": "Supply chain concentration: specialty test component available from single supplier with 6-month lead times",
+        "severity": "high",
+        "evidence": "Contingency supplier still in qualification phase",
+        "verification_needed": true
+      },
+      {
+        "flag": "Regulatory approval timeline published to investors as 18 months but FDA guidance suggests 24-30 months is more realistic",
+        "severity": "medium",
+        "evidence": "Similar companion diagnostics (Guardant Health LUNAR, Invitae) took 24+ months post-breakthrough designation",
+        "verification_needed": true
+      }
+    ],
+    "missing_information": [
+      {
+        "category": "financial_projections",
+        "criticality": "important",
+        "impact": "Series A model shows 3-year revenue projections but does not include cost of goods, regulatory approval delays, or market adoption curves. Path to profitability unclear."
+      },
+      {
+        "category": "competitive_landscape",
+        "criticality": "important",
+        "impact": "No detailed competitive positioning vs DaVita, Fresenius, Alinity diagnostic platforms. Technology differentiation claims need third-party validation."
+      },
+      {
+        "category": "reimbursement_detail",
+        "criticality": "critical",
+        "impact": "CPT code assignments and payer coverage negotiations not documented. Assumed 85% coverage at $200/test; actual may be 40-60% at $120/test depending on category."
+      },
+      {
+        "category": "regulatory_correspondence",
+        "criticality": "important",
+        "impact": "No FDA correspondence or meeting minutes provided. Breakthrough designation status needs verification."
+      }
+    ],
+    "data_quality_assessment": {
+      "source_reliability": "high",
+      "completeness": 0.78,
+      "recency": "Pitch deck from April 2026 (current); regulatory roadmap from March 2026; market research from Q1 2026",
+      "concerns": [
+        "Regulatory documents are company interpretation, not official FDA correspondence",
+        "Market research derived from secondary sources with limited primary customer interviews",
+        "Financial projections lack detailed COGS and reimbursement sensitivity analysis"
+      ]
+    }
+  },
+  "phase2_validations": {
+    "vc_opinion_summary": "Recens Medical demonstrates exceptional regulatory clarity for a medtech company at Series A stage. FDA pathway is well-defined with clear reimbursement path. Repeat revenue model is attractive. Team has prior regulatory experience. Main concern is limited commercial traction.",
+    "claims_extracted": [
+      {
+        "claim_id": "claim_1",
+        "claim_text": "Exceptional regulatory clarity for medtech at Series A; FDA pathway well-defined",
+        "underlying_assumption": "Regulatory pathway articulation is accurate and FDA has committed to breakthrough device designation timeline"
+      },
+      {
+        "claim_id": "claim_2",
+        "claim_text": "Clear reimbursement path through CPT codes",
+        "underlying_assumption": "CPT code assignments will be approved and payers will cover at assumed rates"
+      },
+      {
+        "claim_id": "claim_3",
+        "claim_text": "Repeat revenue model from disposable testing supplies is attractive",
+        "underlying_assumption": "Patient and provider adoption will drive recurring test ordering at projected volumes"
+      },
+      {
+        "claim_id": "claim_4",
+        "claim_text": "Team has prior regulatory experience from exits",
+        "underlying_assumption": "Prior exit experience translates to medtech regulatory navigation at this scale"
+      },
+      {
+        "claim_id": "claim_5",
+        "claim_text": "Main concern is market validation; limited commercial traction",
+        "underlying_assumption": "Market validation risk is primary; regulation and team competency risks are secondary"
+      }
+    ],
+    "claim_assessment": [
+      {
+        "claim_id": "claim_1",
+        "verdict": "partially_supported",
+        "phase1_evidence": "FDA breakthrough designation granted; regulatory roadmap published. However, actual approval timeline typically 24-30 months vs 18 months claimed.",
+        "reasoning": "Breakthrough status is exceptional and accurate. Pathway clarity is good. However, timeline expectations may be optimistic based on comparable devices.",
+        "confidence": 0.75
+      },
+      {
+        "claim_id": "claim_2",
+        "verdict": "insufficient_evidence",
+        "phase1_evidence": "No documentation of actual CPT code application status or payer pre-negotiation results provided.",
+        "reasoning": "Reimbursement pathway assumption is critical but unverified. No actual payer commitments documented.",
+        "confidence": 0.35
+      },
+      {
+        "claim_id": "claim_3",
+        "verdict": "supported",
+        "phase1_evidence": "Disposable format with monthly/quarterly repeat testing aligns with companion diagnostic models (Guardant, Invitae). Recurring revenue model validated across diagnostic industry.",
+        "reasoning": "Repeat testing model is sound. Volume assumptions (30K+ tests/month year 3) are reasonable but depend on market adoption execution.",
+        "confidence": 0.80
+      },
+      {
+        "claim_id": "claim_4",
+        "verdict": "partially_supported",
+        "phase1_evidence": "CEO Quidel exit (diagnostic device company); CTO peer-reviewed publications on biomarkers. However, limited large-scale commercialization experience on team.",
+        "reasoning": "Prior experience is relevant but limited in scope. No evidence of managing diagnostic sales teams or reimbursement negotiations at scale.",
+        "confidence": 0.65
+      },
+      {
+        "claim_id": "claim_5",
+        "verdict": "supported",
+        "phase1_evidence": "Phase 1 analysis confirms market validation is primary near-term risk (5K vs 20K tests/month). Regulatory risks mitigated by breakthrough designation. Team gaps secondary.",
+        "reasoning": "Assessment accurate. Commercial adoption and reimbursement execution are critical path items for success.",
+        "confidence": 0.85
+      }
+    ],
+    "final_recommendation": "VC opinion is largely supported by Phase 1 analysis with important caveats. Regulatory pathway is indeed exceptional and well-clarified. Repeat revenue model is attractive. However, reimbursement pathway remains unverified and market validation is the critical near-term risk. Recommend requiring: (1) CPT code application status documentation, (2) payer coverage pre-negotiation results, (3) revised timeline incorporating realistic FDA approval window.",
+    "investment_decision": "support"
+  },
+  "metadata": {
+    "analysis_id": "ana_20260417_recens_medical_001",
+    "company_name": "Recens Medical",
+    "analysis_date": "2026-04-17T10:00:00Z",
+    "template_type": "ipo_factor_analysis",
+    "model_version": "claude-sonnet-4-20250514",
+    "prompt_version": "v1.0.0",
+    "source_docs": [
+      {
+        "filename": "recens_series_a_deck.pdf",
+        "filetype": "pdf",
+        "size_bytes": 5243456,
+        "extracted_text_length": 12500,
+        "confidence": 0.95,
+        "upload_datetime": "2026-04-17T10:00:00Z"
+      },
+      {
+        "filename": "recens_regulatory_roadmap.pdf",
+        "filetype": "pdf",
+        "size_bytes": 2156784,
+        "extracted_text_length": 6200,
+        "confidence": 0.92,
+        "upload_datetime": "2026-04-17T10:00:00Z"
+      },
+      {
+        "filename": "recens_market_research.docx",
+        "filetype": "docx",
+        "size_bytes": 892341,
+        "extracted_text_length": 4100,
+        "confidence": 0.85,
+        "upload_datetime": "2026-04-17T10:00:00Z"
+      }
+    ],
+    "status": "validated",
+    "status_history": [
+      {
+        "status": "draft",
+        "timestamp": "2026-04-17T10:45:00Z",
+        "actor": "system:analyzer",
+        "notes": "Phase 1 analysis completed"
+      },
+      {
+        "status": "validated",
+        "timestamp": "2026-04-17T11:00:00Z",
+        "actor": "system:validator",
+        "notes": "Phase 2 validation complete; 2 validator flags (reimbursement verification needed, timeline verification needed)"
+      }
+    ],
+    "created_at": "2026-04-17T10:00:00Z",
+    "updated_at": "2026-04-17T11:00:00Z",
+    "created_by": "system:analyzer",
+    "reviewer": null,
+    "review_timestamp": null,
+    "gold_sample_match": "recens_medical",
+    "tags": [
+      "medtech",
+      "regulatory_risk",
+      "repeat_revenue",
+      "ipo_candidate",
+      "seriesA"
+    ],
+    "version": "2.0"
+  }
+}

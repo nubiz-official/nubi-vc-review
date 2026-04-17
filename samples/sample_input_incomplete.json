@@ -1,0 +1,52 @@
+{
+  "company": {
+    "name": "BioMeasure Technologies",
+    "industry": "medtech",
+    "stage": "seed",
+    "founded_year": 2022,
+    "hq_country": "KR",
+    "description": "Sensor prototype for biomarker detection - early stage with limited clinical validation data and undefined regulatory pathway"
+  },
+  "analysis_request": {
+    "purpose": "ipo_factor_analysis",
+    "priority": "high",
+    "context": "Series A extension evaluation - technology unproven in clinical setting, commercialization pathway undefined",
+    "vc_opinion": "BioMeasure's sensor concept is interesting but validation is incomplete. Three critical gaps make this a high-risk investment: First, FDA pathway is completely undefined - they haven't conducted a pre-submission meeting and don't know if their device will be Class II or III. That alone could delay approval 2-5 years. Second, clinical validation is only 50% designed - no active enrollment, no timeline for data readout. Third, unit economics are unknown - they don't have a manufacturing cost target or pricing model. They're essentially asking us to fund clinical validation AND regulatory pathway definition simultaneously. This isn't a near-term commercialization play.",
+    "vc_firm": "Healthcare Innovation Fund",
+    "previous_analysis_id": null
+  },
+  "documents": [
+    {
+      "file_id": "doc_1",
+      "filename": "biomeasure_technical_overview.pdf",
+      "filetype": "pdf",
+      "size_bytes": 3156784,
+      "base64_content": "JVBERi0xLjQKJeLjz9MNCjEgMCBvYmo... (truncated for brevity - simulated tech document)",
+      "doc_type": "pitch_deck",
+      "confidence": 0.88
+    },
+    {
+      "file_id": "doc_2",
+      "filename": "biomeasure_market_size.docx",
+      "filetype": "docx",
+      "size_bytes": 1245632,
+      "base64_content": "UEsDBBQACAAIAP...(truncated for brevity - simulated market document)",
+      "doc_type": "market_research",
+      "confidence": 0.75
+    }
+  ],
+  "quality_flags": {
+    "external_validation_done": false,
+    "missing_key_info": [
+      "FDA classification strategy and pre-submission meeting results",
+      "Unit economics and manufacturing cost structure",
+      "Clinical validation protocol (draft only, 50% complete)",
+      "Reimbursement pathway or pricing model"
+    ],
+    "red_flags_already_identified": [
+      "No regulatory engagement history with FDA or other regulators",
+      "Clinical trial protocol not yet finalized",
+      "Revenue model still being explored (capex vs. consumable vs. software-as-medical-device)"
+    ]
+  }
+}
