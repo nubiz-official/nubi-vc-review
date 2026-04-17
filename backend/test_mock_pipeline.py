@@ -18,6 +18,15 @@ MOCK_CLAUDE_JSON = {
         "basis": "IR 최신 이벤트가 2024.10 FDA De Novo 승인 (KBR 보도 확인). 상장/승인 확정 사실 기반 역산.",
         "disclosure": "본 보고서는 FDA 승인 확정 이후의 역산 관점이며, 모든 시점·수치는 승인 확정 사실에 기반함."
     },
+    "numeric_reference_table": {
+        "revenue_latest": {"value": "2023 매출 58억", "source": "2024 IR p.12", "note": "확정"},
+        "revenue_forecast": {"value": "2024E 150억", "source": "2024 IR p.13", "note": "예상치"},
+        "cumulative_investment": {"value": "500억+", "source": "2024 IR p.4", "note": "확정"},
+        "patent_count": {"value": "등록 37건 / 출원 113건", "source": "2024 IR p.7", "note": "등록·출원 구분"},
+        "countries_coverage": {"value": "인증 20개국 / 판매 12개국", "source": "2024 IR p.10", "note": "인증·판매 구분"},
+        "clinical_cases": {"value": "미국 10개 병원 1,000+ 케이스", "source": "2024 IR p.8", "note": "De Novo 임상"},
+        "overseas_revenue_ratio": {"value": "90%", "source": "2024 IR p.14", "note": "확정"}
+    },
     "headline": "Recens Medical: B+-Grade Investment — HIFU 플랫폼의 FDA De Novo 경로 확정 + 소모품 20% 구조",
     "investment_case": "Recens Medical은 HIFU 기반 정맥 치료 플랫폼으로 FDA De Novo 경로를 6년간 준비하여 임상 1000+ 케이스를 확보했다. 2017년 창업 이후 모듈형 아키텍처로 소모품 매출 비중 20%를 설계했으며, 규제 실행 조직을 선배치했다. 경쟁사 Intuitive Surgical 대비 적응증 특화로 non-inferiority 확보 가능.",
     "investment_decision": "buy",
@@ -76,7 +85,20 @@ MOCK_CLAUDE_JSON = {
     "stage_2_규제통제": {"score": 9.5, "evidence": ["FDA De Novo 경로 확정", "임상 1000+ 케이스 확보"], "confidence": 0.95},
     "stage_3_플랫폼확장": {"score": 8.0, "evidence": ["정맥→종양→심혈관 3개 적응증 확장 가능"], "confidence": 0.85},
     "stage_4_반복매출": {"score": 8.5, "evidence": ["소모품 매출 비중 20%, 유지보수 계약 설계"], "confidence": 0.9},
-    "stage_5_RWW개입": {"score": 8.0, "evidence": ["해외 매출 비중 90% (IR 2024 연결재무제표)", "글로벌 실행력: 미국/유럽/일본 진출, 해외 임상 3건", "NuBIZ 개입 시 아시아 판로 확장 기대"], "confidence": 0.8},
+    "stage_5_RWW개입": {
+        "score": 8.0,
+        "current_execution_evidence": [
+            "해외 매출 비중 90% (IR 2024 연결재무제표)",
+            "글로벌 실행력: 미국/유럽/일본 진출, 해외 임상 3건, 20개국 인증",
+            "Advisory Board 보유, 미국 공급 협의 진행 중"
+        ],
+        "rww_uplift_potential": [
+            "NuBIZ 개입 시 아시아 판로 확장 기대 (가치 증분: [가정] 매출 20~30% 추가)",
+            "규제 문서 자동화로 인허가 사이클 단축 잠재력"
+        ],
+        "evidence": ["해외 매출 비중 90%", "20개국 인증 진출", "NuBIZ 개입 시 아시아 확장 잠재"],
+        "confidence": 0.8
+    },
     "cross_validation": [
         {
             "company": "Intuitive Surgical (ISRG)",
@@ -292,6 +314,47 @@ def run_mock():
     for k, v in wave1g_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [W1-H] Numeric Reference Table 확인 ---")
+    wave1h_checks = {
+        "섹션 헤더": "Numeric Reference Table" in md or "숫자 기준표" in md,
+        "최신 매출 행": "최신 매출" in md and "58억" in md,
+        "특허 등록/출원 구분": "등록 37건" in md and "출원" in md,
+        "국가 인증/판매 구분": "인증 20개국" in md and "판매 12개국" in md,
+        "IR 출처 컬럼": "IR 출처" in md and "2024 IR" in md,
+    }
+    for k, v in wave1h_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-I] stage_5 Current / RWW Uplift 분리 확인 ---")
+    wave1i_checks = {
+        "현재 실행력 헤더": "회사의 현재 실행력" in md or "Current State" in md,
+        "RWW Uplift 헤더": "NuBIZ 개입 잠재력" in md or "RWW Uplift" in md,
+        "Advisory Board (현재)": "Advisory Board" in md,
+        "가치 증분 가정 (Uplift)": "가치 증분" in md and "가정" in md,
+    }
+    for k, v in wave1i_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-J] 섹션 순서 재배치 확인 (Risks가 Early Indicators 앞) ---")
+    exec_pos = md.find("## Executive Summary")
+    num_pos = md.find("## Numeric Reference Table")
+    risks_pos = md.find("## Risks (필수 3종)")
+    early_pos = md.find("## Early Indicators")
+    factor_pos = md.find("## Factor Discovery")
+    cross_pos = md.find("## Cross Validation")
+    rww_pos = md.find("## NuBIZ RWW")
+    final_pos = md.find("## Final Take")
+    wave1j_checks = {
+        "Exec < Numeric": exec_pos >= 0 and num_pos > exec_pos,
+        "Numeric < Risks": num_pos >= 0 and risks_pos > num_pos,
+        "Risks < Early Indicators": risks_pos >= 0 and early_pos > risks_pos,
+        "Factor Discovery < Cross Validation": factor_pos >= 0 and cross_pos > factor_pos,
+        "Cross Validation < RWW": cross_pos >= 0 and rww_pos > cross_pos,
+        "RWW < Final Take": rww_pos >= 0 and final_pos > rww_pos,
+    }
+    for k, v in wave1j_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n" + "=" * 70)
     forbidden = ["Analyzed from IR materials", "Product Market Fit", "Regulatory Pathway Clarity",
                  "Revenue Growth Trajectory", "Team Expansion"]
@@ -308,6 +371,9 @@ def run_mock():
     all_w1e = all(wave1e_checks.values())
     all_w1f = all(wave1f_checks.values())
     all_w1g = all(wave1g_checks.values())
+    all_w1h = all(wave1h_checks.values())
+    all_w1i = all(wave1i_checks.values())
+    all_w1j = all(wave1j_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -332,8 +398,14 @@ def run_mock():
         print("FAIL: Wave 1-F (RWW 가정/추정 라벨) 누락")
     elif not all_w1g:
         print("FAIL: Wave 1-G (Cross Validation 구조화) 누락")
+    elif not all_w1h:
+        print("FAIL: Wave 1-H (Numeric Reference Table) 누락")
+    elif not all_w1i:
+        print("FAIL: Wave 1-I (stage_5 Current/Uplift 분리) 누락")
+    elif not all_w1j:
+        print("FAIL: Wave 1-J (섹션 순서 재배치) 누락")
     else:
-        print("PASS: 모든 항목 + Wave 1 (A/B/C/D) + 즉시 다듬기 (E/F/G) 전부 정상")
+        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 추가 개선 (H/I/J) 전부 정상")
     print("=" * 70)
 
 

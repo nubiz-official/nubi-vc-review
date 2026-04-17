@@ -90,7 +90,8 @@ class Analyzer:
             "momentum_entry_timeline": claude_analysis.get("momentum_entry_timeline", {}),
             "rww_synergy_scenarios": claude_analysis.get("rww_synergy_scenarios", []),
             "nubiz_laws": claude_analysis.get("nubiz_laws", []),
-            "analysis_reference_point": claude_analysis.get("analysis_reference_point", {})
+            "analysis_reference_point": claude_analysis.get("analysis_reference_point", {}),
+            "numeric_reference_table": claude_analysis.get("numeric_reference_table", {})
         }
 
         metadata.status_history.append({
@@ -131,6 +132,17 @@ class Analyzer:
     "basis": "<판단 근거: IR 자료 내 가장 최신 이벤트 (예: 2024.10 FDA 승인 확정) 또는 심사 진행 상태 (예: 2024.03 De Novo 제출, 심사 중)>",
     "disclosure": "<독자 경고 1문장. 예: '본 보고서는 FDA 승인 확정 이후의 역산 관점이며, 모든 시점·수치는 승인 확정된 사실에 기반함.' 또는 '본 보고서는 심사 진행 중 상태의 전망 관점이며, 최종 결과는 확정되지 않았음.'>"
   }},
+
+  "numeric_reference_table": {{
+    "revenue_latest": {{"value": "<IR에서 인용한 최신 매출 (예: 2023년 매출 58억)>", "source": "<IR 페이지/섹션 예: 2024 IR p.12 매출실적>", "note": "<확정/예상/[추정] 라벨>"}},
+    "revenue_forecast": {{"value": "<IR 예상 매출 (예: 2024E 150억)>", "source": "<IR 페이지>", "note": "<예상치임을 명시>"}},
+    "cumulative_investment": {{"value": "<누적 투자금액 (예: 500억)>", "source": "<IR 페이지>", "note": "<확정/[추정]>"}},
+    "patent_count": {{"value": "<특허 건수 — 등록/출원 구분. 예: 등록 37건 / 출원 120건>", "source": "<IR 페이지>", "note": "<등록·출원 구분 명시>"}},
+    "countries_coverage": {{"value": "<판매/인증 국가 수 (예: 인증 20개국, 판매 12개국)>", "source": "<IR 페이지>", "note": "<인증/판매 구분>"}},
+    "clinical_cases": {{"value": "<임상/시술 누적 케이스 (예: 미국 1,000+ 케이스)>", "source": "<IR 페이지>", "note": "<IR 근거>"}},
+    "overseas_revenue_ratio": {{"value": "<해외 매출 비중 % (예: 90%)>", "source": "<IR 페이지>", "note": "<확정/[추정]>"}}
+  }},
+  "// numeric_reference_table 규칙": "이 테이블은 보고서 전체의 숫자 원천(Single Source of Truth)이다. Executive Summary, investment_case, stage evidence, risks, factor_discovery, momentum_entry_timeline, cross_validation 등 다른 모든 섹션에서 이 숫자들을 인용할 때 일관된 값만 사용하라. IR에 근거 없는 수치는 이 테이블에 포함하지 말고 '[IR 미기재]'로 표기. 동일 지표가 섹션마다 다른 값으로 나오지 않도록 엄격히 일치시켜라.",
   "headline": "<회사명>: <한 줄 투자 판단>",
   "investment_case": "<3-5문장 투자 논리. 구체 수치/규제명/플랫폼 포함>",
   "investment_decision": "<strong_buy|buy|hold|strong_avoid>",
@@ -159,7 +171,13 @@ class Analyzer:
   "stage_2_규제통제": {{"score": <0-10 숫자>, "evidence": ["<FDA 경로명 포함 근거>"], "confidence": <0-1>}},
   "stage_3_플랫폼확장": {{"score": <0-10 숫자>, "evidence": ["<적용 가능 영역 수와 근거>"], "confidence": <0-1>}},
   "stage_4_반복매출": {{"score": <0-10 숫자>, "evidence": ["<소모품 비중/구독 구조 근거>"], "confidence": <0-1>}},
-  "stage_5_RWW개입": {{"score": <0-10 숫자>, "evidence": ["<해외 매출 비중(%) — IR 원문에서 숫자 인용>", "<글로벌 실행력 근거: 진출 국가 수, 해외 임상, 해외 파트너십 등>", "<NuBIZ 개입 시 기대 효과>"], "confidence": <0-1>}},
+  "stage_5_RWW개입": {{
+    "score": <0-10 숫자>,
+    "current_execution_evidence": ["<해외 매출 비중(%) — IR 원문에서 숫자 인용>", "<회사가 이미 보유한 글로벌 실행력: 진출 국가, 해외 임상, 해외 파트너십 등>", "<Advisory Board, 미국 공급 협의 등 회사의 실제 실행 근거>"],
+    "rww_uplift_potential": ["<NuBIZ RWW 개입 시 규제/인허가 측면 기대 가치 증분>", "<NuBIZ RWW 개입 시 영업/채널/재구매 측면 기대 가치 증분>"],
+    "evidence": ["<레거시 호환용: current_execution_evidence + rww_uplift_potential 합산 또는 대표 문장 2-3개>"],
+    "confidence": <0-1>
+  }},
 
   "cross_validation": [
     {{
@@ -180,7 +198,7 @@ class Analyzer:
       "applicability_to_subject": "<시사점>"
     }}
   ],
-  "// cross_validation 규칙": "최소 2개, 권장 3-4개. 각 회사는 regulatory_pathway/revenue_model/market_cap_current 3개 팩트 필드를 반드시 채우되, web_search로 검증되지 않은 수치는 '[추정]' 라벨을 붙여라. similarity_dimensions는 해당 회사와 실제로 공유하는 성공 패턴만 포함 (억지 유사성 금지).",
+  "// cross_validation 규칙": "정확히 2~3개만 포함하라. 다음 규칙을 엄격히 준수: (1) 공개 상장사 또는 공개 인수 사례만 허용 (비상장/미상장/비공개는 제외), (2) 'A / B' 합성 entry 금지 — 한 행에 한 회사만, (3) regulatory_pathway/revenue_model/market_cap_current/ipo_year 4개 팩트가 web_search로 검증되지 않으면 아예 포함하지 말라 (품질이 수량보다 우선), (4) similarity_dimensions는 해당 회사와 실제로 공유하는 성공 패턴만 (억지 유사성 금지), (5) 검증 약한 De Novo 사례는 제외하고 ISRG/PROCEPT/InMode/Shockwave/Guardant Health 같은 검증된 peer 우선.",
 
   "risks": [
     {{"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정 여부와 적응증 범위 제한 (예: 특정 시술로만 승인) 구체 기술. IR에서 언급된 제품명/적응증 인용 필수", "severity": "high|medium|low"}},
@@ -188,7 +206,7 @@ class Analyzer:
     {{"risk_type": "valuation", "description": "IPO 목표가 선반영 여부, 특정 연도 매출 목표 (예: 2024E 150억) 달성 불확실성 등 밸류에이션 리스크 구체 기술", "severity": "high|medium|low"}}
   ],
   "// risks 규칙": "위 3종(regulatory, clinical, valuation)은 반드시 모두 포함하라. IR에서 직접 근거를 찾을 수 없으면 '근거 부재'라고 명시하라.",
-  "// stage_5 규칙": "stage_5_RWW개입 evidence의 첫 항목은 반드시 '해외 매출 비중(%)'이어야 한다. IR 원문에서 수치를 찾아 인용하라. 수치 미기재 시 '해외 매출 비중: IR 미기재'라고 명시하라.",
+  "// stage_5 규칙": "stage_5_RWW개입은 반드시 두 레이어로 분리하라: (1) current_execution_evidence — 회사가 이미 가진 실행력 (해외 매출 비중, 진출 국가, 파트너십 등. 첫 항목은 반드시 '해외 매출 비중(%)'. IR 미기재 시 'IR 미기재' 명시), (2) rww_uplift_potential — NuBIZ RWW 플랫폼 개입 시 추가될 가치 증분 가정. 두 레이어를 섞지 마라. evidence 필드는 레거시 호환용이며 current + uplift의 대표 2-3문장만 담아라.",
 
   "missing_information": [
     {{"category": "<카테고리>", "criticality": "critical|important|nice_to_have", "impact": "<왜 중요한가>"}}
@@ -352,17 +370,30 @@ web_search 도구를 활용해 "{company_name} FDA approval", 경쟁사 실적, 
                     counterevidence = stage_data.get("counterevidence", [])
                     if isinstance(counterevidence, str):
                         counterevidence = [counterevidence]
+                    # stage_5 분리 필드 pass-through
+                    current_ev = stage_data.get("current_execution_evidence", [])
+                    if isinstance(current_ev, str):
+                        current_ev = [current_ev]
+                    uplift = stage_data.get("rww_uplift_potential", [])
+                    if isinstance(uplift, str):
+                        uplift = [uplift]
                 else:
                     score = 6.5
                     evidence = []
                     counterevidence = []
-                scores[stage_key] = {
+                    current_ev = []
+                    uplift = []
+                entry = {
                     "score": min(score, 10.0),
                     "rubric_level": "strong" if score >= 8.0 else "adequate" if score >= 6.5 else "concerning",
                     "evidence": evidence,
                     "counterevidence": counterevidence,
                     "confidence": stage_data.get("confidence", 0.85) if isinstance(stage_data, dict) else 0.85
                 }
+                if stage_key == "stage_5_RWW개입":
+                    entry["current_execution_evidence"] = current_ev
+                    entry["rww_uplift_potential"] = uplift
+                scores[stage_key] = entry
 
         stage_scores = [scores[k]["score"] for k in scores if k.startswith("stage_")]
         overall_score = sum(stage_scores) / max(len(stage_scores), 1) if stage_scores else 6.5

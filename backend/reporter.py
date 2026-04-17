@@ -43,6 +43,7 @@ class Reporter:
             "rww_synergy_scenarios": phase1.get("rww_synergy_scenarios", []),
             "nubiz_laws": phase1.get("nubiz_laws", []),
             "analysis_reference_point": phase1.get("analysis_reference_point", {}),
+            "numeric_reference_table": phase1.get("numeric_reference_table", {}),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -127,6 +128,8 @@ class Reporter:
                 "score": round(stage_5_score, 1),
                 "description": "Right-Way-to-Win execution and capital efficiency",
                 "evidence": stage_5_evidence,
+                "current_execution_evidence": self._ensure_list(base_scores.get("stage_5_RWW개입", {}).get("current_execution_evidence", [])),
+                "rww_uplift_potential": self._ensure_list(base_scores.get("stage_5_RWW개입", {}).get("rww_uplift_potential", [])),
                 "supporting_factors": ["Management capability", "Capital efficiency"] + (stage_5_evidence[:1] if stage_5_evidence else []),
                 "risks": ["Execution risk", "Capital requirements"]
             },
@@ -256,6 +259,7 @@ class Reporter:
         rww_scenarios = report_final.get("rww_synergy_scenarios", [])
         laws = report_final.get("nubiz_laws", [])
         ref_point = report_final.get("analysis_reference_point", {})
+        numeric_ref = report_final.get("numeric_reference_table", {})
         appendix = report_final.get("appendix", {})
 
         # ─── Analysis Reference Point 헤더 ───
@@ -295,9 +299,60 @@ class Reporter:
 
 ---
 
-## Early Indicators
+## Numeric Reference Table (보고서 전체 숫자 기준표)
+
+> 본 보고서에서 인용되는 모든 핵심 수치(매출/특허/국가 수/임상 등)의 원천은 이 표입니다. Executive Summary·Stage Evidence·Risks·Factor Discovery·Cross Validation 모두 이 수치와 일치합니다.
 
 """
+        if isinstance(numeric_ref, dict) and numeric_ref:
+            num_labels = [
+                ("revenue_latest", "최신 매출"),
+                ("revenue_forecast", "매출 전망 (예상치)"),
+                ("cumulative_investment", "누적 투자"),
+                ("patent_count", "특허 건수"),
+                ("countries_coverage", "인증/판매 국가 수"),
+                ("clinical_cases", "임상/시술 누적"),
+                ("overseas_revenue_ratio", "해외 매출 비중"),
+            ]
+            md += "| 지표 | 값 | IR 출처 | 비고 |\n|---|---|---|---|\n"
+            for key, label in num_labels:
+                entry = numeric_ref.get(key, {})
+                if isinstance(entry, dict):
+                    val = entry.get("value", "IR 미기재")
+                    src = entry.get("source", "")
+                    note = entry.get("note", "")
+                    md += f"| {label} | {val} | {src} | {note} |\n"
+            md += "\n"
+        else:
+            md += "(숫자 기준표 데이터 없음)\n\n"
+
+        # ─── Risks Section (Executive Summary 직후로 이동) ───
+        md += "---\n\n## Risks (필수 3종)\n\n"
+        risk_label = {
+            "regulatory": "규제 리스크",
+            "clinical": "임상 한계",
+            "valuation": "밸류에이션 리스크"
+        }
+        by_type = {}
+        if isinstance(risks, list):
+            for r in risks:
+                if isinstance(r, dict):
+                    rtype = r.get("risk_type", "other")
+                    by_type.setdefault(rtype, []).append(r)
+        for rtype in ["regulatory", "clinical", "valuation"]:
+            label = risk_label.get(rtype, rtype)
+            items = by_type.get(rtype, [])
+            md += f"### {label}\n"
+            if items:
+                for r in items:
+                    sev = r.get("severity", "")
+                    desc = r.get("description", "")
+                    md += f"- **[{sev.upper()}]** {desc}\n"
+            else:
+                md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
+            md += "\n"
+
+        md += "---\n\n## Early Indicators\n\n"
         if isinstance(early_ind, list):
             for ind in early_ind:
                 if isinstance(ind, dict):
@@ -332,79 +387,44 @@ class Reporter:
             md += f"| {stage_key.replace('stage_', '').replace('_', ' ')} | {stage.get('score', 0):.1f}/10 | {stage.get('description', 'N/A')} |\n"
 
         md += "\n### Stage Evidence\n\n"
+        # stage_5 원본 데이터에서 Current/Uplift 분리 정보 가져오기
+        phase1_scores = scorecard  # compatibility
+        stage5_raw = None
+        # scorecard는 _generate_5stage_scorecard 출력이라 원본 phase1.scores와 다를 수 있음
+        # phase1 원본에 접근: report_final에서 역추적 불가 → scorecard가 evidence만 가짐
+        # 따라서 analyzer의 _extract_scores_from_claude에서 분리 필드를 evidence에 합쳐둔 상태이므로
+        # stage_5만 별도 렌더링 분기
+
         for stage_key in ["stage_1_원천기술통제", "stage_2_규제통제", "stage_3_플랫폼확장", "stage_4_반복매출", "stage_5_RWW개입"]:
             stage = scorecard.get(stage_key, {})
             md += f"**{stage_key}** ({stage.get('score', 0):.1f}/10):\n"
-            for ev in stage.get("evidence", []):
-                md += f"- {ev}\n"
+            if stage_key == "stage_5_RWW개입":
+                current_ev = stage.get("current_execution_evidence", [])
+                uplift = stage.get("rww_uplift_potential", [])
+                # 분리 필드가 있으면 우선 사용
+                if current_ev or uplift:
+                    md += "\n*회사의 현재 실행력 (Current State):*\n"
+                    for ev in (current_ev if isinstance(current_ev, list) else [current_ev]):
+                        if ev:
+                            md += f"- {ev}\n"
+                    md += "\n*NuBIZ 개입 잠재력 (RWW Uplift):*\n"
+                    for ev in (uplift if isinstance(uplift, list) else [uplift]):
+                        if ev:
+                            md += f"- {ev}\n"
+                else:
+                    # 레거시: evidence만 있는 경우
+                    for ev in stage.get("evidence", []):
+                        md += f"- {ev}\n"
+            else:
+                for ev in stage.get("evidence", []):
+                    md += f"- {ev}\n"
             md += "\n"
 
         md += f"""
 **Overall Score:** {scorecard.get('overall_score', 0):.1f}/10
 
 ---
-
-## Cross Validation
-
 """
-        if isinstance(cross_val, list) and cross_val:
-            md += "| 회사 | IPO 연도 | 규제 경로 | 매출 모델 | 시가총액 | 핵심 성과 지표 |\n"
-            md += "|---|---|---|---|---|---|\n"
-            for c in cross_val:
-                if isinstance(c, dict):
-                    row = [
-                        c.get("company", c.get("name", "N/A")),
-                        c.get("ipo_year", ""),
-                        c.get("regulatory_pathway", ""),
-                        c.get("revenue_model", ""),
-                        c.get("market_cap_current", ""),
-                        c.get("key_outcome_metric", c.get("outcome", ""))
-                    ]
-                    md += "| " + " | ".join(str(x) for x in row) + " |\n"
-            md += "\n### 유사성 차원 및 시사점\n\n"
-            for c in cross_val:
-                if isinstance(c, dict):
-                    name = c.get("company", "N/A")
-                    dims = c.get("similarity_dimensions", [])
-                    app = c.get("applicability_to_subject", c.get("relevance_to_subject", ""))
-                    md += f"**{name}**\n"
-                    if dims:
-                        md += f"- 공유 성공 패턴: {', '.join(str(d) for d in dims)}\n"
-                    if app:
-                        md += f"- 시사점: {app}\n"
-                    md += "\n"
-        elif isinstance(cross_val, dict):
-            for c in cross_val.get("comparable_companies", []):
-                md += f"- **{c.get('company', 'N/A')}**: {c.get('outcome', '')}\n"
-        else:
-            md += "(Cross Validation 데이터 없음)\n\n"
-
-        # ─── Risks Section ───
-        md += "\n---\n\n## Risks (필수 3종)\n\n"
-        risk_label = {
-            "regulatory": "규제 리스크",
-            "clinical": "임상 한계",
-            "valuation": "밸류에이션 리스크"
-        }
-        by_type = {}
-        if isinstance(risks, list):
-            for r in risks:
-                if isinstance(r, dict):
-                    rtype = r.get("risk_type", "other")
-                    by_type.setdefault(rtype, []).append(r)
-        for rtype in ["regulatory", "clinical", "valuation"]:
-            label = risk_label.get(rtype, rtype)
-            items = by_type.get(rtype, [])
-            md += f"### {label}\n"
-            if items:
-                for r in items:
-                    sev = r.get("severity", "")
-                    desc = r.get("description", "")
-                    md += f"- **[{sev.upper()}]** {desc}\n"
-            else:
-                md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
-            md += "\n"
-
         # ─── 동력 편입 시점 (Momentum Entry Timeline) ───
         md += "---\n\n## 핵심 동력 편입 시점\n\n"
         if isinstance(momentum, dict) and momentum:
@@ -471,6 +491,40 @@ class Reporter:
                 md += "\n"
         else:
             md += "(Factor Discovery 데이터 없음)\n\n"
+
+        # ─── Cross Validation (Factor Discovery 뒤로 이동) ───
+        md += "---\n\n## Cross Validation\n\n"
+        if isinstance(cross_val, list) and cross_val:
+            md += "| 회사 | IPO 연도 | 규제 경로 | 매출 모델 | 시가총액 | 핵심 성과 지표 |\n"
+            md += "|---|---|---|---|---|---|\n"
+            for c in cross_val:
+                if isinstance(c, dict):
+                    row = [
+                        c.get("company", c.get("name", "N/A")),
+                        c.get("ipo_year", ""),
+                        c.get("regulatory_pathway", ""),
+                        c.get("revenue_model", ""),
+                        c.get("market_cap_current", ""),
+                        c.get("key_outcome_metric", c.get("outcome", ""))
+                    ]
+                    md += "| " + " | ".join(str(x) for x in row) + " |\n"
+            md += "\n### 유사성 차원 및 시사점\n\n"
+            for c in cross_val:
+                if isinstance(c, dict):
+                    name = c.get("company", "N/A")
+                    dims = c.get("similarity_dimensions", [])
+                    app = c.get("applicability_to_subject", c.get("relevance_to_subject", ""))
+                    md += f"**{name}**\n"
+                    if dims:
+                        md += f"- 공유 성공 패턴: {', '.join(str(d) for d in dims)}\n"
+                    if app:
+                        md += f"- 시사점: {app}\n"
+                    md += "\n"
+        elif isinstance(cross_val, dict):
+            for c in cross_val.get("comparable_companies", []):
+                md += f"- **{c.get('company', 'N/A')}**: {c.get('outcome', '')}\n"
+        else:
+            md += "(Cross Validation 데이터 없음)\n\n"
 
         # ─── RWW 퀀텀 점프 시나리오 ───
         md += "\n---\n\n## NuBIZ RWW 플랫폼 적용 시 기업가치 퀀텀 점프 시나리오\n\n"
