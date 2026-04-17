@@ -9,7 +9,6 @@ import os
 
 import streamlit as st
 
-# Set page config FIRST
 st.set_page_config(
     page_title="NuBI VC Review",
     page_icon="📊",
@@ -17,7 +16,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Show init status in UI
 st.write("🚀 Initializing NuBI VC Review...")
 
 import pdfplumber

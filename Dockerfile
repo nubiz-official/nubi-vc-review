@@ -1,10 +1,14 @@
 FROM python:3.11-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends fonts-noto-cjk && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
+COPY services/nubi-vc-review/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY backend/ ./backend/
-COPY streamlit_app/ ./streamlit_app/
-RUN echo ">>> DEBUG: Listing /app/streamlit_app/" && ls -la /app/streamlit_app/
-EXPOSE 8501
-CMD streamlit run streamlit_app/app.py --server.port=${PORT:-8501} --server.address=0.0.0.0 --server.headless=true --logger.level=debug
+COPY services/nubi-vc-review/backend ./backend/
+COPY services/nubi-vc-review/streamlit_app ./streamlit_app/
+COPY services/nubi-vc-review/.streamlit ./.streamlit/
+EXPOSE 8080
+CMD streamlit run streamlit_app/app.py \
+    --server.port=8080 \
+    --server.address=0.0.0.0 \
+    --server.headless=true \
+    --server.enableWebsocketCompression=false
