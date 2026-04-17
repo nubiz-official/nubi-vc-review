@@ -349,6 +349,15 @@ class Reporter:
                 ("clinical_cases", "임상/시술 누적"),
                 ("overseas_revenue_ratio", "해외 매출 비중"),
             ]
+            # 빈칸 비율 계산
+            blank_count = 0
+            total_count = len(num_labels)
+            for key, _ in num_labels:
+                entry = numeric_ref.get(key, {})
+                val = entry.get("value", "") if isinstance(entry, dict) else ""
+                if not val or "미기재" in val or "미공개" in val or "N/A" in val.upper() or val.strip() == "":
+                    blank_count += 1
+
             md += "| 지표 | 값 | IR 출처 | 비고 |\n|---|---|---|---|\n"
             for key, label in num_labels:
                 entry = numeric_ref.get(key, {})
@@ -358,6 +367,21 @@ class Reporter:
                     note = entry.get("note", "")
                     md += f"| {label} | {val} | {src} | {note} |\n"
             md += "\n"
+
+            # 빈칸 비율 ≥ 40%이면 재무 불확실성 경고 블록
+            if blank_count / total_count >= 0.4:
+                uncertainty_points = min(2 * (blank_count / total_count), 2.5)
+                md += f"> ⚠️ **재무 데이터 불확실성 경고**\n"
+                md += f">\n"
+                md += f"> 핵심 재무/운영 지표 {total_count}개 중 **{blank_count}개가 IR 미공개**입니다 ({blank_count/total_count*100:.0f}%).\n"
+                md += f"> 이 수준에서는 5-Stage 점수 신뢰도가 제한됩니다 — **stage 점수에 ±{uncertainty_points:.1f}점 불확실성**을 가정하고 해석하세요.\n"
+                md += f"> 특히 아래 지표가 확정되기 전까지 `Recommendation`과 `Risk Level`은 잠정치입니다:\n"
+                for key, label in num_labels:
+                    entry = numeric_ref.get(key, {})
+                    val = entry.get("value", "") if isinstance(entry, dict) else ""
+                    if not val or "미기재" in val or "미공개" in val or val.strip() == "":
+                        md += f"> - {label}\n"
+                md += "\n"
         else:
             md += "(숫자 기준표 데이터 없음)\n\n"
 
@@ -600,12 +624,29 @@ class Reporter:
         # ─── Cross Validation (Factor Discovery 뒤로 이동) ───
         md += "---\n\n## Cross Validation\n\n"
         if isinstance(cross_val, list) and cross_val:
-            md += "| 회사 | IPO 연도 | 규제 경로 | 매출 모델 | 시가총액 | 핵심 성과 지표 |\n"
-            md += "|---|---|---|---|---|---|\n"
+            # peer_category 카운트
+            cat_count = {"exit_precedent": 0, "structural_comparable": 0, "competitor_benchmark": 0}
             for c in cross_val:
                 if isinstance(c, dict):
+                    cat_count[c.get("peer_category", "structural_comparable")] = cat_count.get(c.get("peer_category", "structural_comparable"), 0) + 1
+
+            # Exit 선례 0개면 경고
+            if cat_count.get("exit_precedent", 0) == 0:
+                md += "> ⚠️ **Cross Validation 경고**: exit_precedent (IPO/인수 선례) 사례가 없습니다. 구조적 유사 회사 또는 경쟁사 벤치마크만 있어 Exit 경로 검증이 약합니다.\n\n"
+
+            md += "| 회사 | 분류 | IPO/인수 연도 | 규제 경로 | 매출 모델 | 시가총액 | 핵심 성과 지표 |\n"
+            md += "|---|---|---|---|---|---|---|\n"
+            for c in cross_val:
+                if isinstance(c, dict):
+                    cat = c.get("peer_category", "")
+                    cat_label = {
+                        "exit_precedent": "📌 Exit 선례",
+                        "structural_comparable": "🔗 구조 유사",
+                        "competitor_benchmark": "⚔️ 경쟁 벤치마크"
+                    }.get(cat, cat)
                     row = [
                         c.get("company", c.get("name", "N/A")),
+                        cat_label,
                         c.get("ipo_year", ""),
                         c.get("regulatory_pathway", ""),
                         c.get("revenue_model", ""),
@@ -635,15 +676,16 @@ class Reporter:
         md += "\n---\n\n## NuBIZ RWW 플랫폼 적용 시 기업가치 퀀텀 점프 시나리오\n\n"
         md += "> ⚠️ 본 섹션의 수치는 RWW 벤치마크 기반 **가정/추정치**이며 실측 데이터가 아닙니다. `[가정]`/`[추정]`/`[벤치마크]` 라벨과 estimate_note를 함께 확인하세요.\n\n"
         if isinstance(rww_scenarios, list) and rww_scenarios:
-            md += "| RWW 개입 영역 | 기대 효과 | 가치 증분 근거 | 근거 유형 | 산출 근거 |\n|---|---|---|---|---|\n"
+            md += "| RWW 개입 영역 | 기대 효과 | 가치 증분 근거 | 매출/비용 연결 | 근거 유형 | 산출 근거 |\n|---|---|---|---|---|---|\n"
             for s in rww_scenarios:
                 if isinstance(s, dict):
                     area = s.get("intervention_area", "")
                     eff = s.get("expected_effect", "")
                     val = s.get("value_increment_basis", "")
+                    rev_link = s.get("revenue_linkage", "")
                     est_type = s.get("estimate_type", "")
                     est_note = s.get("estimate_note", "")
-                    md += f"| {area} | {eff} | {val} | `{est_type}` | {est_note} |\n"
+                    md += f"| {area} | {eff} | {val} | {rev_link} | `{est_type}` | {est_note} |\n"
             md += "\n"
         else:
             md += "(RWW 시너지 시나리오 데이터 없음)\n\n"

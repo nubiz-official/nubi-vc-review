@@ -197,23 +197,25 @@ class Analyzer:
   "cross_validation": [
     {{
       "company": "<회사명 + 티커 예: Intuitive Surgical (ISRG)>",
-      "ipo_year": "<IPO 연도>",
-      "regulatory_pathway": "<규제 경로명 예: FDA PMA / De Novo / 510(k) / CE>",
-      "revenue_model": "<매출 구조 예: razor-blade (소모품 70%+), SaaS recurring, hardware only>",
-      "market_cap_current": "<현재 시가총액 또는 인수가 예: $60B+, 인수 $3.2B>",
-      "similarity_dimensions": ["<이 회사와 공유하는 성공 패턴 1 예: 반복매출 모델>", "<패턴 2 예: 규제 해자>", "<패턴 3 예: 플랫폼 확장>"],
-      "key_outcome_metric": "<핵심 실적 지표 1개 예: 10%+ YoY 25년 지속 / 영업이익률 51%+>",
+      "peer_category": "<'exit_precedent' (IPO/인수 선례) | 'structural_comparable' (구조적 유사) | 'competitor_benchmark' (경쟁사 벤치마크) 중 택1 — exit_precedent 우선>",
+      "ipo_year": "<IPO 연도 또는 인수 연도>",
+      "regulatory_pathway": "<규제 경로명>",
+      "revenue_model": "<매출 구조 예: razor-blade, SaaS, B2B2B 공정장비>",
+      "market_cap_current": "<현재 시가총액 또는 인수가>",
+      "similarity_dimensions": ["<이 회사와 공유하는 성공 패턴 1>", "<패턴 2>", "<패턴 3>"],
+      "key_outcome_metric": "<핵심 실적 지표 1개>",
       "applicability_to_subject": "<이 회사에 주는 시사점 구체 기술>"
     }},
     {{
       "company": "<두 번째 비교 회사>",
+      "peer_category": "<exit_precedent | structural_comparable | competitor_benchmark>",
       "ipo_year": "<연도>", "regulatory_pathway": "<경로>", "revenue_model": "<구조>", "market_cap_current": "<시총>",
       "similarity_dimensions": ["<공유 패턴>", "<공유 패턴>"],
       "key_outcome_metric": "<지표>",
       "applicability_to_subject": "<시사점>"
     }}
   ],
-  "// cross_validation 규칙": "정확히 2~3개만 포함하라. 다음 규칙을 엄격히 준수: (1) 공개 상장사 또는 공개 인수 사례만 허용 (비상장/미상장/비공개는 제외), (2) 'A / B' 합성 entry 금지 — 한 행에 한 회사만, (3) regulatory_pathway/revenue_model/market_cap_current/ipo_year 4개 팩트가 web_search로 검증되지 않으면 아예 포함하지 말라 (품질이 수량보다 우선), (4) similarity_dimensions는 해당 회사와 실제로 공유하는 성공 패턴만 (억지 유사성 금지), (5) 검증 약한 De Novo 사례는 제외하고 ISRG/PROCEPT/InMode/Shockwave/Guardant Health 같은 검증된 peer 우선.",
+  "// cross_validation 규칙": "정확히 2~4개. 다음 규칙을 엄격히 준수: (1) 공개 상장사 또는 공개 인수 사례만 (비상장 제외), (2) 'A / B' 합성 entry 금지 — 한 행에 한 회사, (3) 4개 팩트(ipo_year/regulatory_pathway/revenue_model/market_cap_current)가 web_search 검증 안 되면 제외, (4) similarity_dimensions는 실제 공유 성공 패턴만 (억지 유사성 금지), (5) **중요: 회사의 고객사·경쟁사(Stryker/Zimmer/Medtronic 등 대형 OEM)는 직접 비교 대상으로 쓰지 말라** — 고객사는 peer가 아니라 Diligence Trigger의 '고객 FDA 로드맵'에 넣어야 한다, (6) **Exit 선례 우선**: peer_category='exit_precedent' (IPO 또는 전략 인수 경로가 구조적으로 유사한 회사)를 반드시 최소 1개 포함. 구조적 유사성 판단 기준은 'regulatory_pathway + revenue_model + business_model(B2B/B2B2B/B2C)'이 모두 근접. 예시 — B2B2B 공정장비/의료 제조 SW 회사: Canary Medical(OEM 전략투자 exit), Materialise NV(의료 3D 프린팅 공정 SW IPO), Conformis(환자맞춤형 무릎 임플란트 IPO). 소비재형 medtech: Intuitive Surgical, PROCEPT, Shockwave, InMode. 회사 유형에 맞는 exit 선례를 web_search로 찾아라. (7) competitor_benchmark는 최대 1개만 허용 (많이 넣지 말 것).",
 
   "risks": [
     {{"risk_type": "regulatory", "description": "FDA De Novo 최종 승인 미확정 여부와 적응증 범위 제한 (예: 특정 시술로만 승인) 구체 기술. IR에서 언급된 제품명/적응증 인용 필수", "severity": "high|medium|low"}},
@@ -246,13 +248,13 @@ class Analyzer:
   "// momentum_entry_timeline 규칙": "각 배열은 최소 2개 이상의 시점 이벤트를 포함하라. IR에서 연도/시점 근거를 찾을 수 없으면 'IR 미기재'라고 명시하라.",
 
   "rww_synergy_scenarios": [
-    {{"intervention_area": "규제 문서 자동화", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<예: '[가정] NuBIZ 자체 벤치마크 기준 60% 단축 가정치. 실측 미검증.' — 모든 수치에 가정/추정 근거 명시>"}},
-    {{"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
-    {{"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<영업이익률 개선 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
-    {{"intervention_area": "IR 데이터 자동 생성", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<자금조달 비용 절감 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
-    {{"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<IP 가치 보전/방어 근거>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}}
+    {{"intervention_area": "규제 문서 자동화", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "revenue_linkage": "<Numeric Reference Table 수치와 연결. 예: '510(k) 지연 6개월 단축 → 첫 PO 6개월 조기 발생 → 2028E 매출 50억 중 ~25억 조기 실현'>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<가치 증분 근거>", "revenue_linkage": "<매출·비용에 미치는 구체 영향. Numeric Reference Table 값과 연결>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<영업이익률 개선 근거>", "revenue_linkage": "<영업이익률 개선 → 매출×마진 효과 금액화>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "IR 데이터 자동 생성", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<자금조달 비용 절감 근거>", "revenue_linkage": "<자금조달 비용 X% 절감 → 라운드 규모 대비 Y원>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}},
+    {{"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "<회사 맥락 기대 효과>", "value_increment_basis": "<IP 가치 보전/방어 근거>", "revenue_linkage": "<라이센싱 수익 또는 IP 방어 비용 절감 금액>", "estimate_type": "<assumption|estimate|benchmark_based>", "estimate_note": "<수치 출처/가정 라벨>"}}
   ],
-  "// rww_synergy_scenarios 규칙": "5개 영역 모두 포함. expected_effect/value_increment_basis에 숫자(%·월·배수 등)가 들어가면 반드시 '[가정]' 또는 '[추정]' 또는 '[벤치마크]' 접두어를 붙이고, estimate_note에 근거/출처를 1문장으로 명시하라. 실측 데이터가 아닌 경우 반드시 라벨링하여 오독 방지.",
+  "// rww_synergy_scenarios 규칙": "5개 영역 모두 포함. expected_effect/value_increment_basis/revenue_linkage에 숫자(%·월·배수 등)가 들어가면 반드시 '[가정]' 또는 '[추정]' 또는 '[벤치마크]' 접두어를 붙이고, estimate_note에 근거/출처를 1문장으로 명시. revenue_linkage는 반드시 numeric_reference_table의 실제 수치(매출, 매출 전망, 누적 투자 등)와 연결하여 금액으로 환산하라. '정성적 효과' 같은 추상 서술 금지. 수치 연결이 불가능하면 'numeric_reference_table 값 미확정으로 금액 환산 불가'라고 명시.",
 
   "nubiz_laws": [
     {{"law": "<한 문장 법칙 예: '기술이 아니라 제어력이 상장한다'>", "evidence_for_company": "<회사에 적용된 증거 예: 경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, FDA 재현성 요건 충족>"}},

@@ -135,11 +135,11 @@ MOCK_CLAUDE_JSON = {
         }
     },
     "rww_synergy_scenarios": [
-        {"intervention_area": "규제 문서 자동화", "expected_effect": "[가정] FDA/CE/KGMP 문서 생성 시간 60% 단축", "value_increment_basis": "[가정] 인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생", "estimate_type": "assumption", "estimate_note": "NuBIZ 내부 벤치마크 기반 가정치. 실측 미검증."},
-        {"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "[추정] 20개국 인증을 체계적으로 추적/관리", "value_increment_basis": "[추정] 시장 진입 속도 × 매출 = 밸류에이션 프리미엄", "estimate_type": "estimate", "estimate_note": "회사의 기존 20개국 인증 실적 기반 추정."},
-        {"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "[가정] 총판별 재구매 패턴 분석 → 재고/생산 최적화", "value_increment_basis": "[가정] 영업이익률 추가 5~10%p 개선 가능", "estimate_type": "assumption", "estimate_note": "경쟁사 razor-blade 모델 벤치마크 기반 가정. 회사 고유 상황 미반영."},
-        {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "[추정] 실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "[추정] 투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감", "estimate_type": "estimate", "estimate_note": "정성적 효과. 정량 지표 미산출."},
-        {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "[벤치마크] 150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "[추정] IP 가치 보전 및 방어적 라이센싱 수익", "estimate_type": "benchmark_based", "estimate_note": "회사 실제 특허 건수(IR 기재) 기반. 라이센싱 수익은 추정."}
+        {"intervention_area": "규제 문서 자동화", "expected_effect": "[가정] FDA/CE/KGMP 문서 생성 시간 60% 단축", "value_increment_basis": "[가정] 인허가 달성 시점 6-12개월 앞당김 → 매출 조기 발생", "revenue_linkage": "[가정] 510(k) 6개월 단축 → 2024E 150억 매출 중 ~25억 조기 실현", "estimate_type": "assumption", "estimate_note": "NuBIZ 내부 벤치마크 기반 가정치. 실측 미검증."},
+        {"intervention_area": "다국가 인허가 병렬 관리", "expected_effect": "[추정] 20개국 인증을 체계적으로 추적/관리", "value_increment_basis": "[추정] 시장 진입 속도 × 매출 = 밸류에이션 프리미엄", "revenue_linkage": "[추정] 진출 국가 +5개국 × 국가당 평균 10억 = 추가 50억 매출 잠재", "estimate_type": "estimate", "estimate_note": "회사의 기존 20개국 인증 실적 기반 추정."},
+        {"intervention_area": "소모품/고객 재구매 예측", "expected_effect": "[가정] 총판별 재구매 패턴 분석 → 재고/생산 최적화", "value_increment_basis": "[가정] 영업이익률 추가 5~10%p 개선 가능", "revenue_linkage": "[가정] 2024E 150억 × 5~10%p = 연 7.5~15억 영업이익 증분", "estimate_type": "assumption", "estimate_note": "경쟁사 razor-blade 모델 벤치마크 기반 가정. 회사 고유 상황 미반영."},
+        {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "[추정] 실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "[추정] 투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감", "revenue_linkage": "[추정] IPO 직전 라운드 500억 × 수수료 2%p 절감 = ~10억 조달비용 절감", "estimate_type": "estimate", "estimate_note": "정성적 효과 중심. 정량 지표는 과거 IPO 수수료 벤치마크."},
+        {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "[벤치마크] 150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "[추정] IP 가치 보전 및 방어적 라이센싱 수익", "revenue_linkage": "[추정] 특허 37건(등록) 중 10% 라이센싱 시 연 3~5억 추가 수익 잠재", "estimate_type": "benchmark_based", "estimate_note": "회사 실제 특허 건수(IR 기재) 기반. 라이센싱 수익은 추정."}
     ],
     "investor_concern_validation": [
         {
@@ -205,6 +205,7 @@ MOCK_CLAUDE_JSON = {
     "cross_validation": [
         {
             "company": "Intuitive Surgical (ISRG)",
+            "peer_category": "structural_comparable",
             "ipo_year": "2000",
             "regulatory_pathway": "FDA PMA",
             "revenue_model": "razor-blade (소모품 70%+)",
@@ -215,6 +216,7 @@ MOCK_CLAUDE_JSON = {
         },
         {
             "company": "PROCEPT BioRobotics (PRCT)",
+            "peer_category": "exit_precedent",
             "ipo_year": "2021",
             "regulatory_pathway": "FDA De Novo",
             "revenue_model": "razor-blade (디바이스+소모품)",
@@ -407,7 +409,7 @@ def run_mock():
 
     print("\n--- [W1-G] Cross Validation 구조화 확인 ---")
     wave1g_checks = {
-        "표 헤더 (IPO 연도)": "IPO 연도" in md,
+        "표 헤더 (IPO/인수 연도)": "IPO 연도" in md or "IPO/인수 연도" in md,
         "표 헤더 (규제 경로)": "규제 경로" in md and "FDA PMA" in md,
         "표 헤더 (매출 모델)": "razor-blade" in md,
         "시가총액 컬럼": "$60B+" in md,
@@ -436,6 +438,62 @@ def run_mock():
         "가치 증분 가정 (Uplift)": "가치 증분" in md and "가정" in md,
     }
     for k, v in wave1i_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-V] Cross Validation peer_category 확인 ---")
+    wave1v_checks = {
+        "peer_category 컬럼 (분류)": "분류 |" in md,
+        "Exit 선례 라벨": "Exit 선례" in md,
+        "구조 유사 또는 경쟁 벤치마크 라벨": "구조 유사" in md or "경쟁 벤치마크" in md,
+        "exit_precedent 최소 1개": "📌 Exit 선례" in md,
+    }
+    for k, v in wave1v_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-W] RWW 시나리오 revenue_linkage 확인 ---")
+    wave1w_checks = {
+        "매출/비용 연결 컬럼": "매출/비용 연결" in md,
+        "구체 금액 연결 예시 (25억)": "25억" in md or "~25억" in md,
+        "구체 금액 연결 예시 (영업이익)": "영업이익" in md,
+        "조달비용 절감 예시": "조달비용" in md or "조달 비용" in md,
+    }
+    for k, v in wave1w_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-X] 재무 불확실성 자동 경고 확인 ---")
+    # 리센스 mock은 numeric_reference_table이 채워져 있어서 경고 없음 -> 정상
+    uncertainty_visible = "재무 데이터 불확실성 경고" in md
+    wave1x_checks = {
+        "리센스 mock (채워진 케이스) 경고 없음": not uncertainty_visible,
+    }
+    for k, v in wave1x_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    # Surphase 형 (빈칸 많음) 시뮬레이션 — 별도 호출
+    print("\n--- [W1-X2] 재무 불확실성 경고 — Surphase형 (빈칸 50%+) ---")
+    surphase_numeric_ref = {
+        "revenue_latest": {"value": "IR 미기재", "source": "", "note": ""},
+        "revenue_forecast": {"value": "2028E 55억 / 2032E 1,000억", "source": "IR p.5", "note": "회사 계획"},
+        "cumulative_investment": {"value": "IR 미기재", "source": "", "note": ""},
+        "patent_count": {"value": "등록 3건 / 출원 목표", "source": "IR p.4", "note": "등록·출원 구분"},
+        "countries_coverage": {"value": "IR 미기재", "source": "", "note": ""},
+        "clinical_cases": {"value": "FAI 300ea 계획", "source": "IR p.6", "note": "계획치"},
+        "overseas_revenue_ratio": {"value": "IR 미기재", "source": "", "note": ""},
+    }
+    # Surphase 시나리오 재생성
+    surphase_analysis = dict(analysis_internal)
+    surphase_analysis = {
+        **analysis_internal,
+        "phase1_analysis": {**analysis_internal["phase1_analysis"], "numeric_reference_table": surphase_numeric_ref}
+    }
+    surphase_report = Reporter().generate_report(surphase_analysis)
+    surphase_md = surphase_report.get("markdown", "")
+    wave1x2_checks = {
+        "Surphase 빈칸 많은 케이스 경고 표시": "재무 데이터 불확실성 경고" in surphase_md,
+        "빈칸 개수 표시": "IR 미공개" in surphase_md,
+        "±점 불확실성 표시": "불확실성" in surphase_md and "±" in surphase_md,
+    }
+    for k, v in wave1x2_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
     print("\n--- [W1-Q] Executive One-Line Verdict 확인 ---")
@@ -619,6 +677,10 @@ def run_mock():
     all_w1s = all(wave1s_checks.values())
     all_w1t = all(wave1t_checks.values())
     all_w1u = all(wave1u_checks.values())
+    all_w1v = all(wave1v_checks.values())
+    all_w1w = all(wave1w_checks.values())
+    all_w1x = all(wave1x_checks.values())
+    all_w1x2 = all(wave1x2_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -671,8 +733,16 @@ def run_mock():
         print("FAIL: Wave 1-T (Deal Structuring) 누락")
     elif not all_w1u:
         print("FAIL: Wave 1-U (Nubiz Fit 별점/자산 강화) 누락")
+    elif not all_w1v:
+        print("FAIL: Wave 1-V (Cross Validation peer_category) 누락")
+    elif not all_w1w:
+        print("FAIL: Wave 1-W (RWW revenue_linkage) 누락")
+    elif not all_w1x:
+        print("FAIL: Wave 1-X (리센스 케이스 경고 오표시) 누락")
+    elif not all_w1x2:
+        print("FAIL: Wave 1-X2 (Surphase 빈칸 케이스 경고 미표시) 누락")
     else:
-        print("PASS: 모든 항목 + A~P + Q/R/S/T/U (Surphase 2차 확장) 전부 정상")
+        print("PASS: 모든 항목 + A~U + V/W/X/X2 (Surphase 3차 다듬기) 전부 정상")
     print("=" * 70)
 
 
