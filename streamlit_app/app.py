@@ -4,20 +4,9 @@ NuBI VC Review — 투자 타당성 검토 플랫폼 (Railway 배포용)
 
 Pipeline: Input → Analyzer (Phase 1) → Validator (Phase 2) → Reporter → Display
 """
-import sys
-import os
-
 import streamlit as st
-
-st.set_page_config(
-    page_title="NuBI VC Review",
-    page_icon="📊",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
-
-st.write("🚀 Initializing NuBI VC Review...")
-
+import os
+import sys
 import pdfplumber
 import io
 import json
@@ -26,20 +15,17 @@ from datetime import datetime
 from docx import Document
 import uuid
 
-st.write("✓ Standard libraries loaded")
-
 # Backend imports
 streamlit_dir = os.path.dirname(os.path.abspath(__file__))
 service_root = os.path.dirname(streamlit_dir)
-
 if service_root not in sys.path:
     sys.path.insert(0, service_root)
 
 try:
     from backend import Analyzer, Validator, Reporter, SchemaValidator
-    st.write("✓ Backend modules loaded")
 except ImportError as e:
-    st.error(f"❌ Backend import failed: {e}")
+    st.set_page_config(page_title="Error", page_icon="❌")
+    st.error(f"Backend import failed: {e}")
     import traceback
     st.write(traceback.format_exc())
     st.stop()
@@ -52,8 +38,8 @@ PROVIDER_CONFIGS = {
         "label": "Anthropic Claude",
         "env_var": "ANTHROPIC_API_KEY",
         "models": [
+            "claude-opus-4-7",
             "claude-sonnet-4-20250514",
-            "claude-opus-4-1-20250805",
         ],
     },
     "OpenAI": {
@@ -73,6 +59,13 @@ PROVIDER_CONFIGS = {
         ],
     },
 }
+
+st.set_page_config(
+    page_title="NuBI VC Review",
+    page_icon="📊",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
 
 # ─── CSS ───
 st.markdown("""
