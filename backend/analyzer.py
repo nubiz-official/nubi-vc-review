@@ -253,7 +253,7 @@ web_search 도구를 활용해 "{company_name} FDA approval", 경쟁사 실적, 
             while True:
                 response = self.client.messages.create(
                     model=self.model_version,
-                    max_tokens=8000,
+                    max_tokens=16000,
                     system=system_prompt,
                     tools=tools,
                     messages=messages
@@ -277,35 +277,65 @@ web_search 도구를 활용해 "{company_name} FDA approval", 경쟁사 실적, 
                 messages.append({"role": "assistant", "content": response.content})
                 messages.append({"role": "user", "content": tool_results})
 
-            # Extract final response
-            response_text = ""
-            for block in response.content:
-                if hasattr(block, "text"):
-                    response_text = block.text
-                    break
+            # Extract final response - concatenate ALL text blocks (not just first)
+            response_text = "".join(
+                block.text for block in response.content
+                if hasattr(block, "text") and isinstance(getattr(block, "text", None), str)
+            )
+
+            # Detect truncation: stop_reason == "max_tokens" means output was cut
+            was_truncated = getattr(response, "stop_reason", "") == "max_tokens"
 
             try:
-                json_start = response_text.find('{')
-                json_end = response_text.rfind('}') + 1
-                if json_start != -1 and json_end > json_start:
-                    return json.loads(response_text[json_start:json_end])
-            except json.JSONDecodeError:
-                pass
-
-            return self._parse_claude_text_response(response_text)
+                return self._parse_claude_text_response(response_text)
+            except (ValueError, json.JSONDecodeError) as parse_err:
+                if was_truncated:
+                    raise RuntimeError(
+                        f"Claude 응답이 max_tokens(16000)에서 잘림. 스키마 축소 또는 토큰 상향 필요. "
+                        f"(stop_reason=max_tokens) 앞부분 500자:\n{response_text[:500]}"
+                    )
+                raise
 
         except Exception as e:
             raise RuntimeError(f"Claude API call failed: {e}")
 
     def _parse_claude_text_response(self, text: str) -> Dict[str, Any]:
-        """Parse Claude's text response. Raise on failure - no fallback."""
+        """Parse Claude's text response. Tolerant to code fences with/without closing."""
         import re
-        json_match = re.search(r'```json\s*(.*?)\s*```', text, re.DOTALL)
-        if json_match:
-            return json.loads(json_match.group(1))
-        text = text.strip()
-        if text.startswith('{'):
-            return json.loads(text)
+        stripped = text.strip()
+
+        # 1. ```json ... ``` 완전 펜스
+        m = re.search(r'```json\s*(\{.*?\})\s*```', stripped, re.DOTALL)
+        if m:
+            return json.loads(m.group(1))
+
+        # 2. ```json 으로 시작하지만 닫힘 없는 경우 (truncation) — 여는 펜스만 제거
+        if stripped.startswith("```json"):
+            stripped = stripped[len("```json"):].lstrip()
+            # 혹시 끝에 닫는 펜스만 있으면 제거
+            if stripped.endswith("```"):
+                stripped = stripped[:-3].rstrip()
+
+        # 3. 일반 ``` 펜스
+        elif stripped.startswith("```"):
+            stripped = stripped[3:].lstrip()
+            if stripped.endswith("```"):
+                stripped = stripped[:-3].rstrip()
+
+        # 4. { ... } 범위만 추출해 시도
+        first_brace = stripped.find('{')
+        last_brace = stripped.rfind('}')
+        if first_brace != -1 and last_brace > first_brace:
+            candidate = stripped[first_brace:last_brace + 1]
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+
+        # 5. 전체를 그대로 시도
+        if stripped.startswith('{'):
+            return json.loads(stripped)
+
         raise ValueError(f"Claude 응답에서 JSON 추출 실패:\n{text[:500]}")
 
     def _extract_scores_from_claude(self, claude_analysis: Dict[str, Any]) -> Dict[str, Any]:
