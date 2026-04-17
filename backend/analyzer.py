@@ -10,7 +10,7 @@ from .models import Metadata
 class Analyzer:
     """Claude API-powered Phase 1 analysis engine."""
 
-    def __init__(self, model_version: str = "claude-sonnet-4-20250514", prompt_version: str = "v2.0.0"):
+    def __init__(self, model_version: str = "claude-opus-4-7", prompt_version: str = "v2.0.0"):
         """Initialize analyzer with Anthropic client."""
         self.model_version = model_version
         self.prompt_version = prompt_version

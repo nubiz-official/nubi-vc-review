@@ -10,7 +10,7 @@ from anthropic import Anthropic
 class Reporter:
     """Claude API-powered report generation."""
 
-    def __init__(self, model_version: str = "claude-sonnet-4-20250514"):
+    def __init__(self, model_version: str = "claude-opus-4-7"):
         """Initialize reporter with Anthropic client."""
         self.model_version = model_version
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
