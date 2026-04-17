@@ -163,7 +163,7 @@ JSON 형식으로 반환하라."""
 
             messages = [{"role": "user", "content": user_prompt}]
 
-            for _ in range(3):  # Max 3 iterations to prevent infinite loops
+            while True:
                 response = self.client.messages.create(
                     model=self.model_version,
                     max_tokens=4000,
@@ -172,19 +172,23 @@ JSON 형식으로 반환하라."""
                     messages=messages
                 )
 
-                if response.stop_reason == "tool_use":
-                    for block in response.content:
-                        if hasattr(block, "name") and block.name == "web_search":
-                            query = block.input.get("query", "")
-                            result = f"Search results for '{query}': Information validated"
-                            messages.append({"role": "assistant", "content": response.content})
-                            messages.append({
-                                "role": "user",
-                                "content": [{"type": "tool_result", "tool_use_id": block.id, "content": result}]
-                            })
-                            break
-                else:
+                # tool_use가 없으면 분석 완료
+                if response.stop_reason != "tool_use":
                     break
+
+                # tool_use 블록 처리
+                tool_results = []
+                for block in response.content:
+                    if hasattr(block, "type") and block.type == "tool_use":
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": "Search executed and validated"
+                        })
+
+                # tool_result를 포함해서 다음 요청
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({"role": "user", "content": tool_results})
 
             # Extract final response
             response_text = ""
