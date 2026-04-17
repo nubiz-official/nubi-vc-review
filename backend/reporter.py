@@ -44,6 +44,9 @@ class Reporter:
             "nubiz_laws": phase1.get("nubiz_laws", []),
             "analysis_reference_point": phase1.get("analysis_reference_point", {}),
             "numeric_reference_table": phase1.get("numeric_reference_table", {}),
+            "investor_concern_validation": phase1.get("investor_concern_validation", []),
+            "diligence_trigger_checklist": phase1.get("diligence_trigger_checklist", []),
+            "nubiz_fit_leverage": phase1.get("nubiz_fit_leverage", []),
             "scope_and_limitations": self._generate_scope_limitations(metadata, phase1),
             "appendix": self._generate_appendix(phase1),
             "document_metadata": {
@@ -260,6 +263,9 @@ class Reporter:
         laws = report_final.get("nubiz_laws", [])
         ref_point = report_final.get("analysis_reference_point", {})
         numeric_ref = report_final.get("numeric_reference_table", {})
+        investor_concerns = report_final.get("investor_concern_validation", [])
+        diligence_triggers = report_final.get("diligence_trigger_checklist", [])
+        nubiz_fit = report_final.get("nubiz_fit_leverage", [])
         appendix = report_final.get("appendix", {})
 
         # ─── Analysis Reference Point 헤더 ───
@@ -351,6 +357,28 @@ class Reporter:
             else:
                 md += f"- (Claude 응답에 {rtype} 리스크 누락)\n"
             md += "\n"
+
+        # ─── Investor Concern Validation (Risks 뒤) ───
+        if isinstance(investor_concerns, list) and investor_concerns:
+            md += "---\n\n## Investor Concern Validation\n\n"
+            md += "> 외부 투자자/심사역이 제기한 반대 논리를 IR 근거와 web_search로 검증한 결과입니다.\n\n"
+            md += "| # | 반대 논리 | 판정 | 근거 |\n|---|---|---|---|\n"
+            for i, c in enumerate(investor_concerns, 1):
+                if isinstance(c, dict):
+                    concern = c.get("concern", "")
+                    verdict = c.get("verdict", "")
+                    fact = c.get("fact_check", "")
+                    md += f"| {i} | {concern} | **{verdict}** | {fact} |\n"
+            md += "\n### 판정 상세\n\n"
+            for i, c in enumerate(investor_concerns, 1):
+                if isinstance(c, dict):
+                    md += f"**{i}. {c.get('concern', '')}**\n"
+                    md += f"- 판정: **{c.get('verdict', '')}**\n"
+                    if c.get("reasoning"):
+                        md += f"- 왜 그렇게 판정했는가: {c.get('reasoning')}\n"
+                    if c.get("investment_impact"):
+                        md += f"- 투자 판단에 주는 영향: {c.get('investment_impact')}\n"
+                    md += "\n"
 
         md += "---\n\n## Early Indicators\n\n"
         if isinstance(early_ind, list):
@@ -567,6 +595,41 @@ class Reporter:
             md += "\n"
         else:
             md += "(RWW 시너지 시나리오 데이터 없음)\n\n"
+
+        # ─── Nubiz Fit & Leverage (RWW 시나리오 뒤) ───
+        if isinstance(nubiz_fit, list) and nubiz_fit:
+            md += "---\n\n## Nubiz Fit & Leverage (회사 맞춤 역량 매칭)\n\n"
+            md += "> 누비즈가 이 회사에 실제로 어떤 기여를 할 수 있는지 회사 니즈별로 매칭했습니다.\n\n"
+            md += "| 회사 니즈 | 누비즈 역량 | 개입 방식 | 기대 산출물 | 90일 실행 가능성 |\n|---|---|---|---|---|\n"
+            for f in nubiz_fit:
+                if isinstance(f, dict):
+                    row = [
+                        f.get("company_need", ""),
+                        f.get("nubiz_capability", ""),
+                        f.get("intervention_mode", ""),
+                        f.get("expected_deliverable", ""),
+                        f.get("feasibility_90d", "")
+                    ]
+                    md += "| " + " | ".join(str(x) for x in row) + " |\n"
+            md += "\n"
+
+        # ─── Diligence Trigger Checklist (Final Take 앞) ───
+        if isinstance(diligence_triggers, list) and diligence_triggers:
+            md += "---\n\n## Diligence Trigger Checklist (투자 재고 실사 관문)\n\n"
+            md += "> '투자를 계속 볼지 말지'를 결정하는 관문 항목입니다. Fail 시 의미까지 명시합니다.\n\n"
+            md += "| # | 확인 사항 | 중요도 | 현재 상태 | 다음 증빙 문서 | Fail 시 의미 |\n|---|---|---|---|---|---|\n"
+            for i, t in enumerate(diligence_triggers, 1):
+                if isinstance(t, dict):
+                    row = [
+                        i,
+                        t.get("item", ""),
+                        f"`{t.get('criticality', '')}`",
+                        t.get("current_status", ""),
+                        t.get("next_evidence_needed", ""),
+                        t.get("fail_implication", "")
+                    ]
+                    md += "| " + " | ".join(str(x) for x in row) + " |\n"
+            md += "\n"
 
         # ─── 3대 법칙 (Final Take) ───
         md += "---\n\n## Final Take — 누비즈 3대 법칙\n\n"

@@ -91,7 +91,10 @@ class Analyzer:
             "rww_synergy_scenarios": claude_analysis.get("rww_synergy_scenarios", []),
             "nubiz_laws": claude_analysis.get("nubiz_laws", []),
             "analysis_reference_point": claude_analysis.get("analysis_reference_point", {}),
-            "numeric_reference_table": claude_analysis.get("numeric_reference_table", {})
+            "numeric_reference_table": claude_analysis.get("numeric_reference_table", {}),
+            "investor_concern_validation": claude_analysis.get("investor_concern_validation", []),
+            "diligence_trigger_checklist": claude_analysis.get("diligence_trigger_checklist", []),
+            "nubiz_fit_leverage": claude_analysis.get("nubiz_fit_leverage", [])
         }
 
         metadata.status_history.append({
@@ -247,7 +250,40 @@ class Analyzer:
     {{"law": "<두 번째 법칙 예: '규제는 비용이 아니라 자산이다'>", "evidence_for_company": "<회사 증거 예: FDA De Novo 준비 6년, 1000+ 케이스 → 후발주자 진입 장벽>"}},
     {{"law": "<세 번째 법칙 예: '소모품이 없으면 상장도 없다'>", "evidence_for_company": "<회사 증거 예: 소모품 매출 80%+, CAGR 109%, 영업이익률 51%+>"}}
   ],
-  "// nubiz_laws 규칙": "정확히 3개 법칙을 도출하라. 법칙은 이 회사의 사례에서 일반화 가능한 투자 명제여야 한다. 법칙 문장은 짧고 대비적(A가 아니라 B다 형식 권장)이어야 한다."
+  "// nubiz_laws 규칙": "정확히 3개 법칙을 도출하라. 법칙은 이 회사의 사례에서 일반화 가능한 투자 명제여야 한다. 법칙 문장은 짧고 대비적(A가 아니라 B다 형식 권장)이어야 한다.",
+
+  "investor_concern_validation": [
+    {{
+      "concern": "<투자자(VC/심사역)가 제기한 반대 논리 한 문장. 예: '3D 프린팅이 코팅을 대체할 것이다'>",
+      "fact_check": "<사실 관계 검증 결과. web_search + IR 근거 인용. 예: '3D프린팅은 형상 제작, 코팅은 표면 처리로 별도 공정. Stryker Tritanium이 3D프린팅+코팅을 병용'>",
+      "verdict": "<'타당함' | '부분적으로 타당' | '타당하지 않음' 중 택1>",
+      "reasoning": "<왜 그렇게 판정했는가. 1-2문장>",
+      "investment_impact": "<투자 판단에 주는 영향. 예: '반대 논리가 틀렸으므로 투자 재고 사유 없음' 또는 '부분 타당 — 리프레이밍 시 해소 가능'>"
+    }}
+  ],
+  "// investor_concern_validation 규칙": "사용자가 제공한 vc_opinion 또는 IR에서 드러난 외부 반대 논리가 있을 때만 채워라. 없으면 빈 배열 []. 반대 논리 1개당 1개 entry. verdict는 반드시 3개 enum 중 하나. 억지로 '부분 타당'으로 도망가지 말고 단호한 판정 권장.",
+
+  "diligence_trigger_checklist": [
+    {{
+      "item": "<실사 관문 항목. 예: 'FAI(First Article Inspection) 결과 300개 공동평가 데이터'>",
+      "criticality": "<'critical' | 'high' | 'medium' | 'low' 중 택1>",
+      "current_status": "<현재 상태. 예: '2026 파일럿 제작 중. 데이터 미확보'>",
+      "next_evidence_needed": "<다음 증빙 문서. 예: 'FAI Protocol + 30일 내 공동평가 결과지'>",
+      "fail_implication": "<이 관문이 fail되면 투자 판단에 무슨 의미인가. 예: 'FAI 실패 시 OEM 납품 경로 붕괴 → 투자 재고 필요'>"
+    }}
+  ],
+  "// diligence_trigger_checklist 규칙": "4~8개 항목 권장. IR과 회사 맥락에 실제로 맞는 구체적 관문만 포함. '일반적 due diligence' 같은 추상 항목 금지. FAI/MOU-PO 전환/IP 방어력/고객 FDA 로드맵/핵심 인력/재무 실사 같은 회사별 맞춤 관문을 찾아내라. criticality는 실제 영향도로 냉정하게 판정.",
+
+  "nubiz_fit_leverage": [
+    {{
+      "company_need": "<회사의 구체 니즈. 예: 'FDA 510(k) 고객사 인증 지원 역량 확보'>",
+      "nubiz_capability": "<누비즈 보유 역량 매칭. 예: '에스테틱 의료기기 FDA/CE 11개국 인증 경험'>",
+      "intervention_mode": "<개입 방식. 예: '공동 인증 컨설팅 + 인허가 문서 템플릿 제공'>",
+      "expected_deliverable": "<기대 산출물. 예: '510(k) 제출 Ready Package (protocol + 테스트 리포트 템플릿 + 규제대응 교육)'>",
+      "feasibility_90d": "<'high' | 'medium' | 'low' 중 택1 — 90일 내 실행 가능성>"
+    }}
+  ],
+  "// nubiz_fit_leverage 규칙": "3~6개 항목. 회사 니즈는 IR/반대논리/경쟁구조에서 실제로 추출. '일반적 IR 자동화/마케팅 지원' 같은 추상 매칭 금지. 누비즈 역량(FDA/CE 인증, 로봇제어 SW, 블록체인 품질추적, 데이터 분석, 정부 R&D, 특허관리 등)과 회사 니즈의 구체적 결합만 기술. feasibility_90d는 실제 리소스·기간을 냉정히 반영."
 }}
 ```
 

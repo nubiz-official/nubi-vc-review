@@ -103,6 +103,44 @@ MOCK_CLAUDE_JSON = {
         {"intervention_area": "IR 데이터 자동 생성", "expected_effect": "[추정] 실시간 매출/임상 데이터 기반 IR 자료 업데이트", "value_increment_basis": "[추정] 투자자 커뮤니케이션 효율화 → 자금 조달 비용 절감", "estimate_type": "estimate", "estimate_note": "정성적 효과. 정량 지표 미산출."},
         {"intervention_area": "특허/IP 포트폴리오 관리", "expected_effect": "[벤치마크] 150건+ 글로벌 특허의 만료/갱신/침해 모니터링", "value_increment_basis": "[추정] IP 가치 보전 및 방어적 라이센싱 수익", "estimate_type": "benchmark_based", "estimate_note": "회사 실제 특허 건수(IR 기재) 기반. 라이센싱 수익은 추정."}
     ],
+    "investor_concern_validation": [
+        {
+            "concern": "3D 프린팅이 코팅을 대체할 것이다",
+            "fact_check": "3D프린팅은 형상 제작, 코팅은 표면 처리로 공정이 분리됨. Stryker Tritanium은 3D프린팅 기판 + 표면코팅 병용 사례.",
+            "verdict": "타당하지 않음",
+            "reasoning": "대체 관계가 아니라 보완 관계. 3D프린팅 시장 성장은 표면코팅 수요를 오히려 증가시킴.",
+            "investment_impact": "반대 논리 틀림 — 투자 재고 사유로 부적합"
+        },
+        {
+            "concern": "재생치료가 인공관절 시장을 축소할 것이다",
+            "fact_check": "ACI/MACI는 국소 결함만, MSC 주사는 OA 지연만. 바이오프린팅 연골은 전임상 단계.",
+            "verdict": "타당하지 않음",
+            "reasoning": "말기 골관절염(KL-IV) 환자에게 TKA 이외 선택지는 2040년까지 없음. 재생의료는 5-10년 지연만 가능.",
+            "investment_impact": "반대 논리 틀림 — TKA 수요는 고령화로 오히려 증가"
+        },
+        {
+            "concern": "코팅은 VC 내러티브상 섹시하지 않다",
+            "fact_check": "실제 VC 투자 분류상 '코팅/표면처리'는 소외 영역. 그러나 '의료기기 제조 자동화 로봇'으로 리프레이밍 가능.",
+            "verdict": "부분적으로 타당",
+            "reasoning": "감정적으로는 맞으나, Canary Medical/Zimmer 사례처럼 OEM 전략 투자 경로로 리프레이밍 가능.",
+            "investment_impact": "리프레이밍 조건부 해소 가능 — VC 단독보다 OEM 공동 투자 구조 권장"
+        }
+    ],
+    "diligence_trigger_checklist": [
+        {"item": "FAI(First Article Inspection) 결과 300개 공동평가 데이터", "criticality": "critical", "current_status": "2026 파일럿 제작 중, 데이터 미확보", "next_evidence_needed": "FAI Protocol + 30일 내 공동평가 결과지", "fail_implication": "FAI 실패 시 OEM 납품 경로 붕괴 — 투자 재고 필요"},
+        {"item": "MOU 2개사의 LOI/PO 전환 가능성", "criticality": "critical", "current_status": "MOU 단계, 구체 전환 의향 미확인", "next_evidence_needed": "LOI 또는 구속력 있는 PO 문서", "fail_implication": "PO 미전환 시 매출 추정 전면 재조정"},
+        {"item": "ABB 코마케팅 MOU의 구속력", "criticality": "high", "current_status": "MOU 체결 완료, 독점/기간/지역 불명확", "next_evidence_needed": "MOU 원문 + 독점 조건 확인", "fail_implication": "비구속 MOU 시 유통 채널 신뢰도 하락"},
+        {"item": "IP 포트폴리오 청구항 범위 및 방어력", "criticality": "high", "current_status": "특허 3건 보유, 청구항 세부 미검토", "next_evidence_needed": "특허 청구항 분석 + FTO 리포트", "fail_implication": "회피 설계 가능 시 진입장벽 약화"},
+        {"item": "고객사 FDA 510(k) 로드맵", "criticality": "medium", "current_status": "OEM 고객 FDA 주도인지 Surphase 지원인지 불명확", "next_evidence_needed": "고객 규제 마일스톤 + Surphase 역할 문서", "fail_implication": "규제 책임 불명확 시 매출 인식 시점 지연"},
+        {"item": "CEO 이외 핵심 인력 (코파운더 유무, 리텐션 리스크)", "criticality": "medium", "current_status": "CEO 1인 의존 구조, 코파운더 부재", "next_evidence_needed": "핵심 인력 리텐션 계약 + 조직도", "fail_implication": "CEO 이탈 시 기술 연속성 리스크"}
+    ],
+    "nubiz_fit_leverage": [
+        {"company_need": "FDA/ISO 13485 인증 지원", "nubiz_capability": "P08 에스테틱 의료기기 FDA/CE 11개국 인증 경험", "intervention_mode": "공동 인증 컨설팅 + 문서 템플릿 제공", "expected_deliverable": "510(k) Ready Package + 인증 대응 교육", "feasibility_90d": "high"},
+        {"company_need": "로봇 제어 SW 고도화", "nubiz_capability": "P06 AI로봇 VLA + P08 에너지 제어 기술", "intervention_mode": "로봇셀 제어 알고리즘 공동 최적화", "expected_deliverable": "에너지 제어 최적화 모듈 + 벤치마크 리포트", "feasibility_90d": "medium"},
+        {"company_need": "블록체인 품질 추적 시스템", "nubiz_capability": "P07 RWW + ALCOA+ (GMP 치환 설계)", "intervention_mode": "FAI/코팅 품질 블록체인 추적 구축", "expected_deliverable": "ALCOA+ 준수 품질 추적 시스템 프로토타입", "feasibility_90d": "medium"},
+        {"company_need": "데이터 분석 및 IR 자동화", "nubiz_capability": "NUBiPLOT + NuBI Orchestrator", "intervention_mode": "실시간 매출/FAI 데이터 기반 IR 자동 업데이트", "expected_deliverable": "월별 투자자 대시보드 + IR 자료 자동 생성 파이프라인", "feasibility_90d": "high"},
+        {"company_need": "정부 R&D 과제 수주", "nubiz_capability": "P09 과기부 500억 경험 + 국가과제 다수", "intervention_mode": "과제 기획 공동 작성 + 네트워크 연결", "expected_deliverable": "2건 이상 R&D 과제 제안서 + 참여기관 확보", "feasibility_90d": "medium"}
+    ],
     "nubiz_laws": [
         {"law": "기술이 아니라 제어력이 상장한다", "evidence_for_company": "경쟁사 대비 ±3℃ 정밀도, 초당 50회 피드백, -50℃~+5℃ 범위 제어가 FDA 재현성 요건을 충족"},
         {"law": "규제는 비용이 아니라 자산이다", "evidence_for_company": "FDA De Novo 준비 6년, 임상 1000+ 케이스가 후발주자 진입 장벽으로 전환 — IPO 시 기업가치 3,000억 핵심 드라이버"},
@@ -362,6 +400,40 @@ def run_mock():
     for k, v in wave1i_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [W1-N] Investor Concern Validation 섹션 확인 ---")
+    wave1n_checks = {
+        "섹션 헤더": "Investor Concern Validation" in md,
+        "반대 논리 표 헤더": "반대 논리" in md and "판정" in md,
+        "3D 프린팅 concern": "3D 프린팅" in md or "3D프린팅" in md,
+        "verdict 타당하지 않음": "타당하지 않음" in md,
+        "판정 상세 섹션": "판정 상세" in md,
+    }
+    for k, v in wave1n_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-O] Diligence Trigger Checklist 섹션 확인 ---")
+    wave1o_checks = {
+        "섹션 헤더": "Diligence Trigger Checklist" in md,
+        "FAI 300 항목": "FAI" in md and "300" in md,
+        "criticality 라벨": "`critical`" in md or "`high`" in md,
+        "Fail 시 의미 컬럼": "Fail 시 의미" in md,
+        "6개 관문 포함": md.count("|") > 40,  # 6 rows × 7 cols = 42+ pipes
+    }
+    for k, v in wave1o_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [W1-P] Nubiz Fit & Leverage 섹션 확인 ---")
+    wave1p_checks = {
+        "섹션 헤더": "Nubiz Fit & Leverage" in md,
+        "FDA/ISO 니즈": "FDA/ISO 13485" in md or "FDA" in md and "ISO 13485" in md,
+        "로봇 제어 SW 니즈": "로봇 제어" in md or "로봇 SW" in md,
+        "블록체인 품질추적": "블록체인" in md,
+        "NUBiPLOT 역량": "NUBiPLOT" in md,
+        "90일 실행 가능성 컬럼": "90일 실행 가능성" in md or "90일" in md,
+    }
+    for k, v in wave1p_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n--- [W1-K] Headline 톤 보수화 확인 ---")
     headline = es.get("headline", "")
     wave1k_checks = {
@@ -446,6 +518,9 @@ def run_mock():
     all_w1k = all(wave1k_checks.values())
     all_w1l = all(wave1l_checks.values())
     all_w1m = all(wave1m_checks.values())
+    all_w1n = all(wave1n_checks.values())
+    all_w1o = all(wave1o_checks.values())
+    all_w1p = all(wave1p_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
@@ -482,8 +557,14 @@ def run_mock():
         print("FAIL: Wave 1-L (Investment Case 3문장 압축) 누락")
     elif not all_w1m:
         print("FAIL: Wave 1-M (Early Indicators 공식 통일) 누락")
+    elif not all_w1n:
+        print("FAIL: Wave 1-N (Investor Concern Validation) 누락")
+    elif not all_w1o:
+        print("FAIL: Wave 1-O (Diligence Trigger Checklist) 누락")
+    elif not all_w1p:
+        print("FAIL: Wave 1-P (Nubiz Fit & Leverage) 누락")
     else:
-        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 개선 (H~J) + 2차 다듬기 (K~M) 전부 정상")
+        print("PASS: 모든 항목 + Wave 1 (A~D) + 다듬기 (E~G) + 개선 (H~J) + 2차 (K~M) + Surphase형 (N/O/P) 전부 정상")
     print("=" * 70)
 
 
