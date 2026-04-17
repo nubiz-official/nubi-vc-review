@@ -5,6 +5,17 @@ NuBI VC Review — 투자 타당성 검토 플랫폼 (Railway 배포용)
 Pipeline: Input → Analyzer (Phase 1) → Validator (Phase 2) → Reporter → Display
 """
 import streamlit as st
+print("✓ Streamlit imported")
+
+# Set page config FIRST
+st.set_page_config(
+    page_title="NuBI VC Review",
+    page_icon="📊",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+print("✓ Page config set")
+
 import os
 import sys
 import pdfplumber
@@ -14,6 +25,7 @@ import pandas as pd
 from datetime import datetime
 from docx import Document
 import uuid
+print("✓ Standard libraries imported")
 
 # Backend imports
 streamlit_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,8 +35,8 @@ if service_root not in sys.path:
 
 try:
     from backend import Analyzer, Validator, Reporter, SchemaValidator
+    print("✓ Backend modules imported")
 except ImportError as e:
-    st.set_page_config(page_title="Error", page_icon="❌")
     st.error(f"Backend import failed: {e}")
     import traceback
     st.write(traceback.format_exc())
@@ -59,13 +71,6 @@ PROVIDER_CONFIGS = {
         ],
     },
 }
-
-st.set_page_config(
-    page_title="NuBI VC Review",
-    page_icon="📊",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
 
 # ─── CSS ───
 st.markdown("""
