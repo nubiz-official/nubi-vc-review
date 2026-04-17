@@ -186,7 +186,7 @@ web_search 도구를 활용해 "{company_name} FDA approval", 경쟁사 실적, 
             while True:
                 response = self.client.messages.create(
                     model=self.model_version,
-                    max_tokens=4000,
+                    max_tokens=8000,
                     system=system_prompt,
                     tools=tools,
                     messages=messages
