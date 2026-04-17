@@ -149,7 +149,7 @@ class Analyzer:
   "stage_2_규제통제": {{"score": <0-10 숫자>, "evidence": ["<FDA 경로명 포함 근거>"], "confidence": <0-1>}},
   "stage_3_플랫폼확장": {{"score": <0-10 숫자>, "evidence": ["<적용 가능 영역 수와 근거>"], "confidence": <0-1>}},
   "stage_4_반복매출": {{"score": <0-10 숫자>, "evidence": ["<소모품 비중/구독 구조 근거>"], "confidence": <0-1>}},
-  "stage_5_RWW개입": {{"score": <0-10 숫자>, "evidence": ["<NuBIZ 개입 시 기대 효과>"], "confidence": <0-1>}},
+  "stage_5_RWW개입": {{"score": <0-10 숫자>, "evidence": ["<해외 매출 비중(%) — IR 원문에서 숫자 인용>", "<글로벌 실행력 근거: 진출 국가 수, 해외 임상, 해외 파트너십 등>", "<NuBIZ 개입 시 기대 효과>"], "confidence": <0-1>}},
 
   "cross_validation": [
     {{"company": "Intuitive Surgical (ISRG)", "similarity": "<비교 근거>", "outcome": "<실적 팩트>", "relevance_to_subject": "<이 회사에의 시사점>"}},
@@ -162,6 +162,7 @@ class Analyzer:
     {{"risk_type": "valuation", "description": "IPO 목표가 선반영 여부, 특정 연도 매출 목표 (예: 2024E 150억) 달성 불확실성 등 밸류에이션 리스크 구체 기술", "severity": "high|medium|low"}}
   ],
   "// risks 규칙": "위 3종(regulatory, clinical, valuation)은 반드시 모두 포함하라. IR에서 직접 근거를 찾을 수 없으면 '근거 부재'라고 명시하라.",
+  "// stage_5 규칙": "stage_5_RWW개입 evidence의 첫 항목은 반드시 '해외 매출 비중(%)'이어야 한다. IR 원문에서 수치를 찾아 인용하라. 수치 미기재 시 '해외 매출 비중: IR 미기재'라고 명시하라.",
 
   "missing_information": [
     {{"category": "<카테고리>", "criticality": "critical|important|nice_to_have", "impact": "<왜 중요한가>"}}

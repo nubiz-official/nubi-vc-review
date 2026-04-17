@@ -200,27 +200,18 @@ class Reporter:
         missing_info = phase1.get("missing_information", [])
         red_flags = phase1.get("red_flags", [])
 
-        # Domain logic gaps in v2 framework
+        # v3 framework: Factor Discovery (IPO 역산) implemented via Claude API.
+        # Remaining limitations require human validation at unit-economics/pricing level.
         domain_logic_gaps = [
-            {
-                "item": "IPO reverse-engineering logic not fully integrated",
-                "why": "2017→2024 factor discovery analysis deferred to v3",
-                "impact": "Success pattern extraction is rule-based, not historical fact-driven"
-            },
-            {
-                "item": "FDA pathway specificity requires manual review",
-                "why": "De Novo / 510(k) / PMA classification logic not model-encoded",
-                "impact": "Regulatory pathway scoring is heuristic; expert validation needed"
-            },
             {
                 "item": "Consumables economics requires manual validation",
                 "why": "Recurring revenue mechanics not tied to unit economics/pricing",
-                "impact": "Subscription/razor-blade model assessment is pattern-matched, not calculated"
+                "impact": "Subscription/razor-blade model assessment requires numeric validation"
             },
             {
-                "item": "RWW synergy currently heuristic-based",
-                "why": "Platform value-add calculation not tied to company use case",
-                "impact": "Team/execution scores reflect domain experience, not RWW-specific multipliers"
+                "item": "RWW synergy calculation is qualitative",
+                "why": "Platform value-add not tied to NuBIZ-specific multipliers",
+                "impact": "RWW 개입 효과는 정성적 판단에 의존"
             }
         ]
 

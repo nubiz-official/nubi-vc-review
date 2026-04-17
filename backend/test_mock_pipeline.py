@@ -36,7 +36,7 @@ MOCK_CLAUDE_JSON = {
     "stage_2_규제통제": {"score": 9.5, "evidence": ["FDA De Novo 경로 확정", "임상 1000+ 케이스 확보"], "confidence": 0.95},
     "stage_3_플랫폼확장": {"score": 8.0, "evidence": ["정맥→종양→심혈관 3개 적응증 확장 가능"], "confidence": 0.85},
     "stage_4_반복매출": {"score": 8.5, "evidence": ["소모품 매출 비중 20%, 유지보수 계약 설계"], "confidence": 0.9},
-    "stage_5_RWW개입": {"score": 8.0, "evidence": ["NuBIZ 개입 시 아시아 판로 확장 기대"], "confidence": 0.8},
+    "stage_5_RWW개입": {"score": 8.0, "evidence": ["해외 매출 비중 90% (IR 2024 연결재무제표)", "글로벌 실행력: 미국/유럽/일본 진출, 해외 임상 3건", "NuBIZ 개입 시 아시아 판로 확장 기대"], "confidence": 0.8},
     "cross_validation": [
         {"company": "Intuitive Surgical (ISRG)", "similarity": "소모품 비중 높은 medtech", "outcome": "IPO 2000, $60B+ 시총", "relevance_to_subject": "소모품 중심 medtech IPO 가능성 입증"},
         {"company": "PROCEPT BioRobotics (PRCT)", "similarity": "FDA De Novo 경로 활용", "outcome": "IPO 2021, $100M+ 매출", "relevance_to_subject": "De Novo 경로 IPO 가속 사례"}
@@ -141,6 +141,22 @@ def run_mock():
     for k, v in fd_checks.items():
         print(f"    {'OK' if v else 'FAIL'}: {k}")
 
+    print("\n--- [6] stage_5 해외 매출 비중 확인 ---")
+    overseas_checks = {
+        "해외 매출 비중 문구": "해외 매출 비중" in md,
+        "90% 수치": "90%" in md or "90 %" in md,
+    }
+    for k, v in overseas_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
+    print("\n--- [7] Appendix obsolete 문구 제거 확인 ---")
+    obsolete_checks = {
+        "IPO reverse-engineering obsolete 문구 제거": "IPO reverse-engineering logic not fully integrated" not in md,
+        "v3 planned obsolete 문구 제거": "deferred to v3" not in md,
+    }
+    for k, v in obsolete_checks.items():
+        print(f"    {'OK' if v else 'FAIL'}: {k}")
+
     print("\n" + "=" * 70)
     forbidden = ["Analyzed from IR materials", "Product Market Fit", "Regulatory Pathway Clarity",
                  "Revenue Growth Trajectory", "Team Expansion"]
@@ -148,14 +164,20 @@ def run_mock():
     bad = [f for f in forbidden if f in full_text]
     all_risks_ok = all(risk_checks.values())
     all_fd_ok = all(fd_checks.values())
+    all_overseas_ok = all(overseas_checks.values())
+    all_obsolete_ok = all(obsolete_checks.values())
     if bad:
         print(f"FAIL: 하드코딩 템플릿 잔존: {bad}")
     elif not all_risks_ok:
         print("FAIL: Risks 3종 중 일부 누락")
     elif not all_fd_ok:
         print("FAIL: Factor Discovery 역산 테이블 누락")
+    elif not all_overseas_ok:
+        print("FAIL: stage_5 해외 매출 비중 누락")
+    elif not all_obsolete_ok:
+        print("FAIL: Appendix obsolete 문구 잔존")
     else:
-        print("PASS: 하드코딩 제거 + Risks 3종 + Factor Discovery 역산 테이블 모두 정상")
+        print("PASS: 모든 항목 정상 (하드코딩/Risks/FactorDiscovery/해외매출/Appendix)")
     print("=" * 70)
 
 
